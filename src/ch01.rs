@@ -30,3 +30,15 @@ pub fn join_alt(str1: &str, str2: &str)-> String {
         .map(|(ch1, ch2)| format!("{}{}", ch1,ch2))
         .collect::<String>()
 }
+
+/// ch1.03 convert "piem" to Pi.
+/// Note) "piem" is the sentence,
+/// "Now I need a drink, alcoholic of course, after the heavy lectures involving quantum mechanics."
+///  The sequence of its word-length means the ratio of the circumference of a circle to the diameter.
+///
+pub fn convert_piem() -> Vec<usize> {
+    let piem = "Now I need a drink, alcoholic of course, after the heavy lectures involving quantum mechanics.";
+    piem.split_whitespace()
+        .map(|s| s.len()%10)
+        .collect()
+}
