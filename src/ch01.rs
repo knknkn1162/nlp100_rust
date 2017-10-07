@@ -36,9 +36,9 @@ pub fn join_alt(str1: &str, str2: &str)-> String {
 /// "Now I need a drink, alcoholic of course, after the heavy lectures involving quantum mechanics."
 ///  The sequence of its word-length means the ratio of the circumference of a circle to the diameter.
 ///
-pub fn convert_piem() -> Vec<usize> {
+pub fn convert_piem() -> Vec<u32> {
     let piem = "Now I need a drink, alcoholic of course, after the heavy lectures involving quantum mechanics.";
     piem.split_whitespace()
-        .map(|s| s.len()%10)
+        .map(|s| (s.trim_matches(|c| c == ',' || c == '.').len()%10) as u32)
         .collect()
 }
