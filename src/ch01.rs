@@ -21,3 +21,12 @@ pub fn extract<Pred>(str: &str, pred: Pred)-> String
         .map(|(_, elem)| elem)
         .collect::<String>()
 }
+
+/// ch1.02 concat two words alternatively. (e.g. "abc", "def" => "adbecf")
+///
+pub fn join_alt(str1: &str, str2: &str)-> String {
+    str1.chars()
+        .zip(str2.chars())
+        .map(|(ch1, ch2)| format!("{}{}", ch1,ch2))
+        .collect::<String>()
+}
