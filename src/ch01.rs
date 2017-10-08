@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /// ch1.00 reverse "stressed"
 ///
 /// ```
@@ -41,4 +43,26 @@ pub fn convert_piem() -> Vec<u32> {
     piem.split_whitespace()
         .map(|s| (s.trim_matches(|c| c == ',' || c == '.').len()%10) as u32)
         .collect()
+}
+
+/// ch1.04 convert mnemoric to periodic table which type is HashMap.
+///
+pub fn generate_periodic_table<'a>()-> HashMap<&'a str, u32> {
+    let mnemoric = "Hi He Lied Because Boron Could Not Oxidize Fluorine. \
+        New Nations Might Also Sign Peace Security Clause. Arthur King Can.";
+    let word_length = mnemoric.split_whitespace().count();
+    let indexes: Vec<usize> = [1, 5, 6, 7, 8, 9, 15, 16, 19].iter().map(|s| ((s-1) as usize)).collect();
+    let take_mapping: HashMap<usize, usize> =
+        (0..word_length)
+            .map(
+            |s|
+                if indexes.contains(&s) {(s, 1)} else {(s, 2)})
+            .collect();
+    mnemoric.split_whitespace()
+        .enumerate()
+        .map(|(idx, elem)|
+            (&elem[0..take_mapping[&idx]], ((idx+1) as u32) )
+        )
+        .collect()
+
 }
