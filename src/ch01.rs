@@ -66,3 +66,9 @@ pub fn generate_periodic_table<'a>()-> HashMap<&'a str, u32> {
         .collect()
 
 }
+
+/// ch1.05 n-gram
+///
+pub fn generate_ngram(text: &str, size: usize, analysis_type: &str) {
+
+}
