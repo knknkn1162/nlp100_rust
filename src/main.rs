@@ -13,9 +13,9 @@ fn main() {
     assert_eq!(periodic_table, ch01::generate_periodic_table());
 
     let sentence = "I am an NLPer";
-    assert_eq!(["I am", "am an", "an NLPer"], ch01::generate_ngram(sentence, size=2, analysis_type="word"));
+    assert_eq!(["I am", "am an", "an NLPer"], ch01::generate_ngram(sentence, 2, "word"));
     assert_eq!(["I ", " a", "am", " a", "an", " N", "NL", "LP", "Pe", "er"],
-        ch01::generate_ngram(sentence, size=2, analysit_type="character")
+        ch01::generate_ngram(sentence, 2, "character")
     )
 }
 
