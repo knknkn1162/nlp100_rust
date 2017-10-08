@@ -10,7 +10,7 @@ fn main() {
     assert_eq!(str_pi, ch01::convert_piem());
 
     let periodic_table = get_periodic_table();
-    //assert_eq!(periodic_table, ch01::generate_periodic_table())
+    assert_eq!(periodic_table, ch01::generate_periodic_table())
 }
 
 /// helper for ch1.03
