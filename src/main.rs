@@ -76,6 +76,9 @@ fn main() {
 
     assert!(union.contains("se"));
 
+    // ch01.Q07
+    assert_eq!("12時の気温は22.4", ch01::generate_description(12, "気温", 22.4));
+
 }
 
 /// helper for ch1.03
