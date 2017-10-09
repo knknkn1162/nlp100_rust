@@ -92,3 +92,24 @@ pub enum AnalysisType {
     Character,
 
 }
+
+
+/// ch01.06 Intersection, union, difference of two HashSets
+///
+pub fn calc_two_bigrams(text1: &str, text2: &str, calc_type: CalcType)-> HashSet<String> {
+    let bigram1 = generate_ngram(text1, 2, AnalysisType::Character);
+    let bigram2 = generate_ngram(text2, 2, AnalysisType::Character);
+    match calc_type {
+        CalcType::InterSection => bigram1.intersection(&bigram2).map(|s| s.to_string()).collect(),
+        CalcType::Union => bigram1.union(&bigram2).map(|s| s.to_string()).collect(),
+        CalcType::Difference => bigram1.difference(&bigram2).map(|s| s.to_string()).collect(),
+    }
+}
+
+
+
+pub enum CalcType {
+    InterSection,
+    Union,
+    Difference,
+}
