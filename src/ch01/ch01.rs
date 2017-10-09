@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt::Display;
 
-use rand::{thread_rng, Rng};
+use rand::{Rng, thread_rng};
 
 
 /// ch1.00 reverse "stressed"
