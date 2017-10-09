@@ -23,8 +23,7 @@ pub fn extract<Pred>(str: &str, pred: Pred)-> String
 {
     str.chars()
         .enumerate()
-        .filter(|&(idx, _)| pred(idx))
-        .map(|(_, elem)| elem)
+        .filter_map(|(idx, elem)| if pred(idx) {Some(elem)} else {None})
         .collect::<String>()
 }
 
