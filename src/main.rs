@@ -55,3 +55,10 @@ fn get_periodic_table<'a>()-> HashMap<&'a str, u32> {
         ("S", 16), ("Cl", 17), ("Ar", 18), ("K", 19), ("Ca", 20)
     ].iter().cloned().collect()
 }
+
+/// list of &str to HashSet
+fn convert_hashset(lst: Vec<&str>)-> HashSet<String> {
+    lst.iter()
+        .map(|&s| s.to_string())
+    .collect::<HashSet<String>>()
+}
