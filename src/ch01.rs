@@ -69,6 +69,22 @@ pub fn generate_periodic_table<'a>()-> HashMap<&'a str, u32> {
 
 /// ch1.05 n-gram
 ///
-pub fn generate_ngram(text: &str, size: usize, analysis_type: &str) {
+pub fn generate_ngram(text: &str, size: usize, analysis_type: AnalysisType)-> Vec<String> {
+    match analysis_type {
+        AnalysisType::Word => {
+            let txt_lst: Vec<&str> = text.split_whitespace().collect();
+            (0..txt_lst.len()-(size-1))
+                .map(|idx| txt_lst[idx..idx+size].join(" "))
+                .collect()
+        },
+        AnalysisType::Character => vec!["vec".to_string()]
+    }
+
+}
+
+
+pub enum AnalysisType {
+    Word,
+    Character,
 
 }
