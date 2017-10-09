@@ -24,13 +24,13 @@ fn main() {
     //ch01.Q05
     let sentence = "I am an NLPer";
     assert_eq!(
-        convert_hashset(
+        convert_to_hashset(
         vec!["I am", "am an", "an NLPer"]
         ),
         ch01::generate_ngram(sentence, 2, AnalysisType::Word)
     );
     assert_eq!(
-        convert_hashset(
+        convert_to_hashset(
         vec!["I ", " a", "am", "m ", " a", "an", "n ", " N", "NL", "LP", "Pe", "er"]
         ),
         ch01::generate_ngram(sentence, 2, AnalysisType::Character)
@@ -38,14 +38,14 @@ fn main() {
 
     //ch01.Q06
     let (word1, word2) = ("paraparaparadise","paragraph");
-    assert_eq!(convert_hashset(
+    assert_eq!(convert_to_hashset(
         vec!["pa", "ar", "ra", "ap", "pa", "ar", "ra", "ap", "pa", "ar", "ra", "ad", "di", "is", "se"]
         ),
         ch01::generate_ngram(word1, 2, AnalysisType::Character)
     );
 
     assert_eq!(
-        convert_hashset(
+        convert_to_hashset(
         vec!["pa", "ar", "ra", "ag", "gr", "ra", "ap", "ph"]
         ),
         ch01::generate_ngram(word2, 2, AnalysisType::Character)
@@ -74,7 +74,7 @@ fn get_periodic_table<'a>()-> HashMap<&'a str, u32> {
 }
 
 /// list of &str to HashSet use this in Q05 & Q06
-fn convert_hashset(lst: Vec<&str>)-> HashSet<String> {
+fn convert_to_hashset(lst: Vec<&str>)-> HashSet<String> {
     lst.iter()
         .map(|&s| s.to_string())
     .collect::<HashSet<String>>()
