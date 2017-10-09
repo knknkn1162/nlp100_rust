@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use std::fmt::Display;
 
 /// ch1.00 reverse "stressed"
 ///
@@ -112,4 +113,10 @@ pub enum CalcType {
     InterSection,
     Union,
     Difference,
+}
+
+
+/// ch01.07 generate description
+pub fn generate_description<A: Display, B: Display, C: Display>(x: A, y: B, z: C)-> String {
+    format!("{}時の{}は{}", x, y, z)
 }
