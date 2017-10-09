@@ -3,16 +3,25 @@ mod ch01;
 use ch01::AnalysisType; // use ch01.Q05
 
 fn main() {
+    //ch01.Q00
     assert_eq!("desserts", ch01::reverse("stressed"));
+
+    //ch01.Q01
     assert_eq!("パトカー", ch01::extract("パタトクカシーー", |idx| idx%2==0));
+
+    //ch01.Q02
     assert_eq!("パタトクカシーー", ch01::join_alt("パトカー", "タクシー"));
+
+    //ch01.Q03
     let str_pi = get_pi_lst(16); // 16 significant figures
     assert_eq!(vec![3,1,4,1,5,9,2,6,5,3,5,8,9,7,9], str_pi);
     assert_eq!(str_pi, ch01::convert_piem());
 
+    //ch01.Q04
     let periodic_table = get_periodic_table();
     assert_eq!(periodic_table, ch01::generate_periodic_table());
 
+    //ch01.Q05
     let sentence = "I am an NLPer";
     assert_eq!(vec!["I am", "am an", "an NLPer"],
                ch01::generate_ngram(sentence, 2, AnalysisType::Word)
