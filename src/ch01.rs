@@ -1,6 +1,9 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt::Display;
 
+use rand::{thread_rng, Rng};
+
+
 /// ch1.00 reverse "stressed"
 ///
 /// ```
@@ -124,4 +127,26 @@ pub fn generate_description<A: Display, B: Display, C: Display>(x: A, y: B, z: C
 /// ch01.08 cipher text
 pub fn generate_cipher(text: &str)-> String {
     text.chars().map(|s| if s.is_lowercase() {219 as char} else {s}).collect()
+}
+
+/// ch01.09 Typoglycemia. That means each character of word is randomize except first & last character.
+///
+pub fn generate_typoglycemia(text: &str)-> String {
+    let mut rng = thread_rng();
+    text.split_whitespace().map(
+        |s| match s.len()  {
+        1 ... 4 => s.to_string(),
+            _ => {
+                let mut iter = s.chars();
+                let ch_first = iter.next().unwrap();
+                let mut vec = iter.collect::<Vec<char>>();
+                let ch_last = vec.pop().unwrap();
+                rng.shuffle(&mut vec);
+                format!("{}{}{}",
+                        ch_first,
+                        vec.into_iter().collect::<String>(),
+                        ch_last)
+            },
+        }
+    ).collect::<Vec<String>>().join(" ")
 }
