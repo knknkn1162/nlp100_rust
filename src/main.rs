@@ -17,7 +17,7 @@ fn main() {
     assert_eq!(vec!["I am", "am an", "an NLPer"],
                ch01::generate_ngram(sentence, 2, AnalysisType::Word)
     );
-    assert_eq!(vec!["I ", " a", "am", " a", "an", " N", "NL", "LP", "Pe", "er"],
+    assert_eq!(vec!["I ", " a", "am", "m ", " a", "an","n ", " N", "NL", "LP", "Pe", "er"],
         ch01::generate_ngram(sentence, 2, AnalysisType::Character)
     )
 }
