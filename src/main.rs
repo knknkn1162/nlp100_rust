@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 mod ch01;
+use ch01::AnalysisType; // use ch01.Q05
 
 fn main() {
     assert_eq!("desserts", ch01::reverse("stressed"));
@@ -13,9 +14,11 @@ fn main() {
     assert_eq!(periodic_table, ch01::generate_periodic_table());
 
     let sentence = "I am an NLPer";
-    assert_eq!(["I am", "am an", "an NLPer"], ch01::generate_ngram(sentence, 2, "word"));
-    assert_eq!(["I ", " a", "am", " a", "an", " N", "NL", "LP", "Pe", "er"],
-        ch01::generate_ngram(sentence, 2, "character")
+    assert_eq!(vec!["I am", "am an", "an NLPer"],
+               ch01::generate_ngram(sentence, 2, AnalysisType::Word)
+    );
+    assert_eq!(vec!["I ", " a", "am", " a", "an", " N", "NL", "LP", "Pe", "er"],
+        ch01::generate_ngram(sentence, 2, AnalysisType::Character)
     )
 }
 
