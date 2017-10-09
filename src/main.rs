@@ -23,12 +23,16 @@ fn main() {
 
     //ch01.Q05
     let sentence = "I am an NLPer";
-    assert_eq!(vec!["I am", "am an", "an NLPer"],
+    assert_eq!(["I am", "am an", "an NLPer"].iter()
+                   .map(|s| s.to_string())
+                   .collect::<HashSet<String>>(),
                ch01::generate_ngram(sentence, 2, AnalysisType::Word)
     );
-    assert_eq!(vec!["I ", " a", "am", "m ", " a", "an","n ", " N", "NL", "LP", "Pe", "er"],
-        ch01::generate_ngram(sentence, 2, AnalysisType::Character)
-    )
+    assert_eq!(["I ", " a", "am", "m ", " a", "an", "n ", " N", "NL", "LP", "Pe", "er"].iter()
+                   .map(|s| s.to_string())
+                   .collect::<HashSet<String>>(),
+               ch01::generate_ngram(sentence, 2, AnalysisType::Character)
+    );
 }
 
 /// helper for ch1.03
