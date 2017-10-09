@@ -2,6 +2,8 @@ use std::collections::{HashMap, HashSet};
 mod ch01;
 use ch01::{AnalysisType, CalcType}; // use ch01.Q05
 
+extern crate rand;
+
 fn main() {
     //ch01.Q00
     assert_eq!("desserts", ch01::reverse("stressed"));
@@ -82,7 +84,13 @@ fn main() {
     // ch01.Q08
     let sample = "12aBcdE8Qq";
     //let ch_219 = 'Û';
-    assert_eq!("12ÛBÛÛE8QÛ", ch01::generate_cipher(sample))
+    assert_eq!("12ÛBÛÛE8QÛ", ch01::generate_cipher(sample));
+
+    let sample_txt = "I couldn't believe that I could actually understand what I was reading :\
+     the phenomenal power of the human mind .";
+
+    println!("{}", ch01::generate_typoglycemia(sample_txt));
+
 
 }
 
