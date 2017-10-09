@@ -73,7 +73,7 @@ fn get_periodic_table<'a>()-> HashMap<&'a str, u32> {
     ].iter().cloned().collect()
 }
 
-/// list of &str to HashSet
+/// list of &str to HashSet use this in Q05 & Q06
 fn convert_hashset(lst: Vec<&str>)-> HashSet<String> {
     lst.iter()
         .map(|&s| s.to_string())
