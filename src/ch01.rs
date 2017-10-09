@@ -120,3 +120,8 @@ pub enum CalcType {
 pub fn generate_description<A: Display, B: Display, C: Display>(x: A, y: B, z: C)-> String {
     format!("{}時の{}は{}", x, y, z)
 }
+
+/// ch01.08 cipher text
+pub fn generate_cipher(text: &str)-> String {
+    text.chars().map(|s| if s.is_lowercase() {219 as char} else {s}).collect()
+}
