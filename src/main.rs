@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 mod ch01;
-use ch01::AnalysisType; // use ch01.Q05
+use ch01::{AnalysisType, CalcType}; // use ch01.Q05
 
 fn main() {
     //ch01.Q00
@@ -50,6 +50,32 @@ fn main() {
         ),
         ch01::generate_ngram(word2, 2, AnalysisType::Character)
     );
+
+    let union =
+        ch01::calc_two_bigrams(word1, word2, CalcType::Union);
+
+    assert_eq!(
+        convert_to_hashset(
+            vec!["pa", "ad", "gr", "ph", "ap", "is", "se", "ar", "ra", "ag", "di"]
+        ),
+        union
+    );
+
+    assert_eq!(
+        convert_to_hashset(
+            vec!["ar", "pa", "ra", "ap"]
+        ),
+        ch01::calc_two_bigrams(word1, word2, CalcType::InterSection)
+    );
+
+    assert_eq!(
+        convert_to_hashset(
+        vec!["ad", "is", "di", "se"]
+        ), ch01::calc_two_bigrams(word1, word2, CalcType::Difference)
+    );
+
+    assert!(union.contains("se"));
+
 }
 
 /// helper for ch1.03
