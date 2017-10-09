@@ -79,6 +79,11 @@ fn main() {
     // ch01.Q07
     assert_eq!("12時の気温は22.4", ch01::generate_description(12, "気温", 22.4));
 
+    // ch01.Q08
+    let sample = "12aBcdE8Qq";
+    //let ch_219 = 'Û';
+    assert_eq!("12ÛBÛÛE8QÛ", ch01::generate_cipher(sample))
+
 }
 
 /// helper for ch1.03
