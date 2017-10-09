@@ -77,7 +77,11 @@ pub fn generate_ngram(text: &str, size: usize, analysis_type: AnalysisType)-> Ve
                 .map(|idx| txt_lst[idx..idx+size].join(" "))
                 .collect()
         },
-        AnalysisType::Character => vec!["vec".to_string()]
+        AnalysisType::Character => {
+            (0..text.len()-(size-1))
+                .map(|idx| (&text[idx..idx+size]).to_string())
+                .collect()
+        }
     }
 
 }
