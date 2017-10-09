@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 /// ch1.00 reverse "stressed"
 ///
@@ -69,7 +69,7 @@ pub fn generate_periodic_table<'a>()-> HashMap<&'a str, u32> {
 
 /// ch1.05 n-gram
 ///
-pub fn generate_ngram(text: &str, size: usize, analysis_type: AnalysisType)-> Vec<String> {
+pub fn generate_ngram(text: &str, size: usize, analysis_type: AnalysisType)-> HashSet<String> {
     match analysis_type {
         AnalysisType::Word => {
             let txt_lst: Vec<&str> = text.split_whitespace().collect();
