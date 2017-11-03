@@ -20,7 +20,8 @@ impl<'a> FileExtractor<'a> {
         Ok(line)
     }
 
-    pub fn wc(&self)->usize {
+    /// ch01.10 count lines
+    pub fn count_lines(&self)->usize {
         let s = self.read().unwrap();
         s.lines().collect::<Vec<_>>().len()
     }
