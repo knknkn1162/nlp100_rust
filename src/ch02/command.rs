@@ -26,6 +26,23 @@ impl Commander {
         debug!("stdout: {}", String::from_utf8_lossy(&output.stdout));
         debug!("stderr: \n{}", String::from_utf8_lossy(&output.stderr));
     }
+
+    /// test ch02_10; count lines in the designated file.
+    pub fn get_lines(&self)->Result<usize, ::std::num::ParseIntError> {
+        let output = Command::new("wc")
+            .arg("-l")
+            .arg(&self.path)
+            .output().expect("fail to execute process");
+
+        String::from_utf8_lossy(&output.stdout)
+            .as_ref()
+            .trim()
+            .split(" ")
+            .take(1)
+            .collect::<String>()
+            .parse::<usize>()
+
+    }
 }
 
 #[cfg(test)]
