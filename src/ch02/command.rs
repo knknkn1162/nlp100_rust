@@ -11,8 +11,8 @@ pub fn prepare<P: AsRef<Path>>(save_path: P) {
         .args(&["-o", save_path.as_ref().to_str().unwrap()])
         .output().expect("fail to execute process");
 
-    debug!("status: \n{:?}", output.status);
-    debug!("stdout: \n{}", String::from_utf8_lossy(&output.stdout));
+    debug!("status: {:?}", output.status);
+    debug!("stdout: {}", String::from_utf8_lossy(&output.stdout));
     debug!("stderr: \n{}", String::from_utf8_lossy(&output.stderr));
 }
 
