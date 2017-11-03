@@ -1,4 +1,5 @@
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::io::{Read, Write};
 use std::path::Path;
 
 pub struct Commander {path: String}
@@ -41,7 +42,31 @@ impl Commander {
             .take(1)
             .collect::<String>()
             .parse::<usize>()
+    }
 
+    /// ch02_11; replace tab to space
+    pub fn replace_tab_to_space(&self)->String {
+        let mut cat = Command::new("cat")
+            .arg(&self.path)
+            .stdout(Stdio::piped())
+            .spawn().expect("fail to execute cat command");
+        let mut tr = Command::new("tr")
+            .arg("[:blank:]")
+            .arg(" ")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn().expect("fail to execute tr command");
+        // see https://www.reddit.com/r/rust/comments/3azfie/how_to_pipe_one_process_into_another/
+        if let Some(ref mut stdout) = cat.stdout {
+            if let Some(ref mut stdin) = tr.stdin {
+                let mut buf: Vec<u8> = Vec::new();
+                stdout.read_to_end(&mut buf).unwrap();
+                stdin.write_all(&buf).unwrap();
+
+            }
+        }
+        let res = tr.wait_with_output().unwrap().stdout;
+        String::from_utf8_lossy(&res).to_string()
     }
 }
 
