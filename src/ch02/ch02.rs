@@ -25,6 +25,12 @@ impl<'a> FileExtractor<'a> {
         let s = self.read().unwrap();
         s.lines().collect::<Vec<_>>().len()
     }
+
+    /// ch01.11 replace a tab-character to a space
+    pub fn replace_tab_to_space(&self)->String {
+        let s = self.read().unwrap();
+        s.replace("\t", " ")
+    }
 }
 
 #[cfg(test)]
