@@ -98,6 +98,18 @@ mod tests {
         let commander = Commander::new(save_path);
 
         assert_eq!(commander.count_lines().unwrap(), 24);
+    }
+
+    #[test]
+    fn test_replace_tab_to_space() {
+        let save_path = Path::new("./data/ch02/hightemp.txt");
+        let commander = Commander::new(save_path);
+        let res = commander.replace_tab_to_space();
+
+        assert_eq!(
+            res.lines().take(1).collect::<String>(),
+            "高知県 江川崎 41 2013-08-12"
+        )
 
     }
 }
