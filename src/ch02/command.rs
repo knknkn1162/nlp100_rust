@@ -28,7 +28,7 @@ impl Commander {
     }
 
     /// test ch02_10; count lines in the designated file.
-    pub fn get_lines(&self)->Result<usize, ::std::num::ParseIntError> {
+    pub fn count_lines(&self)->Result<usize, ::std::num::ParseIntError> {
         let output = Command::new("wc")
             .arg("-l")
             .arg(&self.path)
@@ -68,11 +68,11 @@ mod tests {
     }
 
     #[test]
-    fn test_get_lines() {
+    fn test_count_lines() {
         let save_path = Path::new("./data/ch02/hightemp.txt");
         let commander = Commander::new(save_path);
 
-        assert_eq!(commander.get_lines().unwrap(), 24);
+        assert_eq!(commander.count_lines().unwrap(), 24);
 
     }
 }
