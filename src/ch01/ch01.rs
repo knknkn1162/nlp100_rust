@@ -1,19 +1,20 @@
+//! This is the answer in http://www.cl.ecei.tohoku.ac.jp/nlp100/#ch1
+//!
+
+extern crate rand;
+
 use std::collections::{HashMap, HashSet};
 use std::fmt::Display;
 
-use rand::{Rng, thread_rng};
+use ch01::structure::{AnalysisType, CalcType};
+
+use self::rand::{Rng, thread_rng};
 
 
 /// ch1.00 reverse "stressed"
 ///
-/// ```
-/// chs = str.chars(): Chars // An iterator over the chars of a string slice.
-/// rev = chs.rev(): std::iter::Rev // Reverses an iterator's direction.
-/// ans = rev.collect::<String>() // Transforms an iterator into a collection.
-/// ```
-///
 pub fn reverse(str: &str)-> String {
-    str.chars().rev().collect::<String>()
+    str.chars().rev().collect()
 }
 
 /// ch1.01 extract chars of odd position from "パタトクカシーー"
@@ -24,7 +25,7 @@ pub fn extract<Pred>(str: &str, pred: Pred)-> String
     str.chars()
         .enumerate()
         .filter_map(|(idx, elem)| if pred(idx) {Some(elem)} else {None})
-        .collect::<String>()
+        .collect()
 }
 
 /// ch1.02 concat two words alternatively. (e.g. "abc", "def" => "adbecf")
@@ -48,6 +49,19 @@ pub fn convert_piem() -> Vec<u32> {
         .collect()
 }
 
+
+/// helper for ch1.03
+/// convert Pi to vec<u32>
+#[warn(dead_code)]
+fn get_pi_digits(n: usize)->Vec<u32> {
+    use std::f64;
+    format!("{}", f64::consts::PI)
+        .chars()
+        .take(n)
+        .filter_map(|s| s.to_digit(10))
+        .collect()
+}
+
 /// ch1.04 convert mnemoric to periodic table which type is HashMap.
 ///
 pub fn generate_periodic_table<'a>()-> HashMap<&'a str, u32> {
@@ -61,6 +75,7 @@ pub fn generate_periodic_table<'a>()-> HashMap<&'a str, u32> {
             |s|
                 if indexes.contains(&s) {(s, 1)} else {(s, 2)})
             .collect();
+
     mnemoric.split_whitespace()
         .enumerate()
         .map(|(idx, elem)|
@@ -72,49 +87,35 @@ pub fn generate_periodic_table<'a>()-> HashMap<&'a str, u32> {
 
 /// ch1.05 n-gram
 ///
-pub fn generate_ngram(text: &str, size: usize, analysis_type: AnalysisType)-> HashSet<String> {
-    match analysis_type {
+pub fn generate_ngram(text: &str, size: usize, analysis_type: &AnalysisType)-> HashSet<String> {
+    match *analysis_type {
         AnalysisType::Word => {
             let txt_lst: Vec<&str> = text.split_whitespace().collect();
-            (0..txt_lst.len()-(size-1))
-                .map(|idx| txt_lst[idx..idx+size].join(" "))
+            (0..txt_lst.len() - (size - 1))
+                .map(|idx| txt_lst[idx..idx + size].join(" "))
                 .collect()
         },
         AnalysisType::Character => {
-            (0..text.len()-(size-1))
-                .map(|idx| (&text[idx..idx+size]).to_string())
+            (0..text.len() - (size - 1))
+                .map(|idx| (&text[idx..idx + size]).to_string())
                 .collect()
         }
     }
-
-}
-
-
-pub enum AnalysisType {
-    Word,
-    Character,
-
 }
 
 
 /// ch01.06 Intersection, union, difference of two HashSets
 ///
 pub fn calc_two_bigrams(text1: &str, text2: &str, calc_type: CalcType)-> HashSet<String> {
-    let bigram1 = generate_ngram(text1, 2, AnalysisType::Character);
-    let bigram2 = generate_ngram(text2, 2, AnalysisType::Character);
+    let size = 2;
+    let analysis_type = AnalysisType::Character;
+    let bigram1: HashSet<String> = generate_ngram(text1, size, &analysis_type);
+    let bigram2: HashSet<String> = generate_ngram(text2, size, &analysis_type);
     match calc_type {
         CalcType::InterSection => bigram1.intersection(&bigram2).map(|s| s.to_string()).collect(),
         CalcType::Union => bigram1.union(&bigram2).map(|s| s.to_string()).collect(),
         CalcType::Difference => bigram1.difference(&bigram2).map(|s| s.to_string()).collect(),
     }
-}
-
-
-
-pub enum CalcType {
-    InterSection,
-    Union,
-    Difference,
 }
 
 
@@ -148,4 +149,124 @@ pub fn generate_typoglycemia(text: &str)-> String {
             },
         }
     ).collect::<Vec<String>>().join(" ")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::iter::FromIterator;
+
+    #[test]
+    fn test_ch01_00_reverse() {
+        assert_eq!("desserts", reverse("stressed"));
+    }
+
+    #[test]
+    fn test_ch01_01_extract() {
+        assert_eq!("パトカー", extract("パタトクカシーー", |idx| idx % 2 == 0));
+    }
+
+    #[test]
+    fn test_ch01_02_join_alt() {
+        assert_eq!("パタトクカシーー", join_alt("パトカー", "タクシー"));
+    }
+
+    #[test]
+    fn test_helper_ch01_03_get_pi_digits() {
+        let str_pi = get_pi_digits(16); // 16 significant figures
+        assert_eq!(vec![3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9], str_pi);
+    }
+
+    #[test]
+    fn test_ch01_03_convert_piem() {
+        assert_eq!(get_pi_digits(16), convert_piem());
+    }
+
+    #[test]
+    fn test_ch01_04_generate_periodic_table() {
+        let periodic_table = [
+            ("H", 1), ("He", 2), ("Li", 3), ("Be", 4), ("B", 5), ("C", 6), ("N", 7), ("O", 8),
+            ("F", 9), ("Ne", 10), ("Na", 11), ("Mi", 12), // In fact mnemonics "might" doesn't strictly same as "Mg"
+            ("Al", 13), ("Si", 14), ("P", 15),
+            ("S", 16), ("Cl", 17), ("Ar", 18), ("K", 19), ("Ca", 20)
+        ].iter().cloned().collect::<HashMap<_, _>>();
+        assert_eq!(periodic_table, generate_periodic_table());
+    }
+
+    #[test]
+    fn test_ch01_05_generate_ngram() {
+        let sentence = "I am an NLPer";
+        assert_eq!(
+            HashSet::from_iter(vec!["I am", "am an", "an NLPer"]
+                .into_iter()
+                .map(|s| s.to_string())
+            ),
+            generate_ngram(sentence, 2, &AnalysisType::Word)
+        );
+        assert_eq!(
+            HashSet::from_iter(vec!["I ", " a", "am", "m ", " a", "an", "n ", " N", "NL", "LP", "Pe", "er"]
+                    .into_iter()
+                    .map(|s| s.to_string())
+            ),
+            generate_ngram(sentence, 2, &AnalysisType::Character)
+        );
+    }
+
+    #[test]
+    fn test_ch01_06_calc_two_diagrams() {
+        // bigram of word1 is {"pa", "ar", "ra", "ap", "ad", "di", "is", "se"}
+        // bigram of word2 is {"pa", "ar", "ag", "gr", "ap", "ph"]
+        let (word1, word2) = ("paraparaparadise","paragraph");
+
+        let union =
+            calc_two_bigrams(word1, word2, CalcType::Union);
+
+        assert_eq!(
+            HashSet::from_iter(vec!["pa", "ad", "gr", "ph", "ap", "is", "se", "ar", "ra", "ag", "di"]
+                    .into_iter()
+                    .map(|s| s.to_string())
+            ),
+            union
+        );
+        assert!(union.contains("se"));
+
+        assert_eq!(
+            HashSet::from_iter(vec!["ar", "pa", "ra", "ap"]
+                    .into_iter()
+                    .map(|s| s.to_string())
+            ),
+            calc_two_bigrams(word1, word2, CalcType::InterSection)
+        );
+
+        assert_eq!(
+            HashSet::from_iter(
+                vec!["ad", "is", "di", "se"]
+                    .into_iter()
+                    .map(|s| s.to_string())
+            ),
+            calc_two_bigrams(word1, word2, CalcType::Difference)
+        );
+    }
+
+    #[test]
+    fn test_ch01_07_generate_description() {
+        // ch01.Q07
+        assert_eq!("12時の気温は22.4", generate_description(12, "気温", 22.4));
+    }
+
+    #[test]
+    fn test_ch01_08_generate_cipher() {
+        // ch01.Q08
+        let sample = "12aBcdE8Qq";
+        //let ch_219 = 'Û';
+        assert_eq!("12ÛBÛÛE8QÛ", generate_cipher(sample));
+    }
+
+    #[test]
+    fn test_ch01_09_generate_typoglycemia() {
+        let sample_txt = "I couldn't believe that I could actually understand what I was reading :\
+     the phenomenal power of the human mind.";
+
+        println!("{}", generate_typoglycemia(sample_txt));
+    }
 }
