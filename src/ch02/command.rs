@@ -1,19 +1,31 @@
 use std::process::Command;
 use std::path::Path;
 
-/// preparation for ch02; save the tab-splited file, hightemp.txt
-/// The file is the record of maximum temperature in Japan.
-/// these data are composed of prefecture, location, temperature and date.
-pub fn prepare<P: AsRef<Path>>(save_path: P) {
-    let path = "http://www.cl.ecei.tohoku.ac.jp/nlp100/data/hightemp.txt";
-    let output = Command::new("curl")
-        .arg(path)
-        .args(&["-o", save_path.as_ref().to_str().unwrap()])
-        .output().expect("fail to execute process");
+pub struct Commander {path: String}
 
-    debug!("status: {:?}", output.status);
-    debug!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-    debug!("stderr: \n{}", String::from_utf8_lossy(&output.stderr));
+impl Commander {
+
+    pub fn new<P: AsRef<Path>>(save_path: P)->Commander {
+        Commander {
+            path: save_path.as_ref().to_str().expect("contains invalid utf-8 character").to_owned()
+        }
+    }
+
+    /// preparation for ch02; save the tab-splited file, hightemp.txt
+    /// exec `curl http://www.cl.ecei.tohoku.ac.jp/nlp100/data/hightemp.txt" -o ${save_path}`
+    /// The file is the record of maximum temperature in Japan.
+    /// these data are composed of prefecture, location, temperature and date.
+    pub fn prepare(&self) {
+        let path = "http://www.cl.ecei.tohoku.ac.jp/nlp100/data/hightemp.txt";
+        let output = Command::new("curl")
+            .arg(path)
+            .args(&["-o", self.path.as_str()])
+            .output().expect("fail to execute process");
+
+        debug!("status: {:?}", output.status);
+        debug!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        debug!("stderr: \n{}", String::from_utf8_lossy(&output.stderr));
+    }
 }
 
 #[cfg(test)]
@@ -32,7 +44,8 @@ mod tests {
         let save_path = Path::new("./data/ch02/hightemp.txt");
 
         fs::create_dir(save_path.parent().unwrap()); // If success or not, ignore result
-        prepare(save_path);
+        let commander = Commander::new(save_path);
+        commander.prepare();
 
         assert!(save_path.exists())
     }
