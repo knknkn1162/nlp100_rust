@@ -2,15 +2,15 @@ use std::io::{BufReader, Read};
 use std::fs::File;
 use std::io;
 
-struct FileExtractor {path: String}
+struct FileExtractor<'a> {path: &'a str}
 
-impl FileExtractor {
-    pub fn new(path: String)-> FileExtractor {
+impl<'a> FileExtractor<'a> {
+    pub fn new(path: &'a str)-> FileExtractor<'a> {
         FileExtractor {path: path}
     }
 
     fn read(&self)->Result<String,io::Error>  {
-        let f = File::open(&self.path)?; // read only.
+        let f = File::open(self.path)?; // read only.
         let mut reader = BufReader::new(f);
 
         let mut line = String::new();
@@ -28,11 +28,11 @@ impl FileExtractor {
 
 #[cfg(test)]
 mod test {
-    use ch02::command;
+    use ch02::command::Commander;
     use super::FileExtractor;
     #[test]
     fn test_read() {
-        let fext = FileExtractor {path: "./data/ch02/hightemp.txt".to_owned()};
+        let fext = FileExtractor {path: "./data/ch02/hightemp.txt"};
 
         let res = fext.read().unwrap();
 
