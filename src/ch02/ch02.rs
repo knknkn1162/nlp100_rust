@@ -42,4 +42,13 @@ mod test {
             "高知県\t江川崎\t41\t2013-08-12"
         );
     }
+
+    #[test]
+    fn test_ch02_10_count_lines() {
+        let path = "./data/ch02/hightemp.txt";
+        let fxt = FileExtractor {path: path};
+
+        let commander = Commander::new(path);
+        assert_eq!(fxt.count_lines(), commander.count_lines().unwrap())
+    }
 }
