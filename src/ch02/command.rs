@@ -66,4 +66,13 @@ mod tests {
 
         assert!(save_path.exists())
     }
+
+    #[test]
+    fn test_get_lines() {
+        let save_path = Path::new("./data/ch02/hightemp.txt");
+        let commander = Commander::new(save_path);
+
+        assert_eq!(commander.get_lines().unwrap(), 24);
+
+    }
 }
