@@ -66,7 +66,7 @@ impl Commander {
             }
         }
         let res = tr.wait_with_output().unwrap().stdout;
-        String::from_utf8_lossy(&res).to_string()
+        String::from_utf8(res).expect("contain invalid utf-8 character")
     }
 }
 
