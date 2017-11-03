@@ -57,4 +57,17 @@ mod test {
         let commander = Commander::new(path);
         assert_eq!(fxt.count_lines(), commander.count_lines().unwrap())
     }
+
+    #[test]
+    fn test_ch02_11_replace_tab_to_space() {
+        let path = "./data/ch02/hightemp.txt";
+        let fxt = FileExtractor {path: path};
+
+        let commander = Commander::new(path);
+
+        assert_eq!(
+            fxt.replace_tab_to_space(),
+            commander.replace_tab_to_space()
+        )
+    }
 }
