@@ -85,7 +85,9 @@ mod tests {
         env_logger::init().unwrap();
         let save_path = Path::new("./data/ch02/hightemp.txt");
 
-        fs::create_dir(save_path.parent().unwrap()); // If success or not, ignore result
+        // Success or not, ignore result
+        // see also https://github.com/rust-lang/rust/pull/11754#issuecomment-33202664
+        let _ = fs::create_dir(save_path.parent().unwrap());
         let commander = Commander::new(save_path);
         commander.prepare();
 
