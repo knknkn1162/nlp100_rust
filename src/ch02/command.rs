@@ -19,7 +19,7 @@ impl Commander {
         let path = "http://www.cl.ecei.tohoku.ac.jp/nlp100/data/hightemp.txt";
         let output = Command::new("curl")
             .arg(path)
-            .args(&["-o", self.path.as_str()])
+            .args(&["-o", &self.path])
             .output().expect("fail to execute process");
 
         debug!("status: {:?}", output.status);
