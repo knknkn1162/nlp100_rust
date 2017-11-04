@@ -333,6 +333,23 @@ mod test {
             vs.into_iter().collect::<HashSet<_>>(),
             hashset
         )
+    }
+
+    #[test]
+    fn test_save_split() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+
+        let save_path = Path::new("./data/ch02/split_");
+
+        let n = 3;
+
+        // check number of success in files must be equal to n
+        assert_eq!(
+            fxt.save_split(n, &save_path),
+            n
+        )
 
     }
 }
