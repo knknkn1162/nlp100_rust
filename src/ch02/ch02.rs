@@ -33,21 +33,31 @@ impl<'a> FileExtractor<'a> {
         s.replace("\t", " ")
     }
 
-    /// helper for ch02.11
+    /// helper for ch02.12
     fn extract_row<T: AsRef<Path>>(&self, n: usize, file: &T) {
         let s = self.read().unwrap();
 
         let file = File::create(file).unwrap();
-        let mut file = LineWriter::new(file);
-        s.lines()
+        let data = s.lines()
             .map(|line| {
-                let res = line.split('\t')
+                line.split('\t')
                     .nth(n)
-                    .unwrap();
-                file.write(res.as_bytes()).unwrap()
+                    .unwrap()
             })
-            .collect::<Vec<_>>();
+            .collect::<Vec<_>>().join("\n");
+        let _ = LineWriter::new(file).write(data.as_bytes());
+    }
 
+    /// ch02.12; save first and second row in each file
+    pub fn extract_first_second_row<T: AsRef<Path>>(&self, file1: &T, file2: &T) {
+        let s = self.read().unwrap();
+
+        vec![file1, file2]
+            .into_iter()
+            .enumerate()
+            .map(|(idx, file)|
+                self.extract_row(idx, file)
+            ).collect::<Vec<_>>();
     }
 
 
@@ -56,7 +66,7 @@ impl<'a> FileExtractor<'a> {
 #[cfg(test)]
 mod test {
     use ch02::command::Commander;
-    use super::FileExtractor;
+    use super::*;
     #[test]
     fn test_read() {
         let fext = FileExtractor {path: "./data/ch02/hightemp.txt"};
