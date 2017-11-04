@@ -69,21 +69,13 @@ impl Commander {
     }
 
     /// preparation to ch02_12
-    fn extract_row(&self, n: usize)->String {
+    pub fn extract_row(&self, n: usize) -> String {
         let res = Command::new("cut")
-            .args(&["-f", &format!("{}", n+1)]) // start at 0
+            .args(&["-f", &format!("{}", n + 1)]) // start at 0
             .arg(&self.path)
             .output().expect("fail to execute cut command");
 
-        String::from_utf8(res.stdout).expect("contain invalid utf-8 character")
-    }
-    /// ch02_12; extract first and second row and save each file.
-    fn extract_first_second_row(&self)->(String, String) {
-        let mut res = (0..2)
-            .map(|n|
-                self.extract_row(n as usize)
-            );
-        (res.next().unwrap(), res.next().unwrap())
+        String::from_utf8_lossy(&res.stdout).trim().to_string()
     }
 }
 
@@ -138,15 +130,5 @@ mod tests {
             commander.extract_row(0).lines().next().unwrap(), // take first line
             "高知県"
         );
-    }
-
-    #[test]
-    fn test_extract_first_second_row() {
-        let load_path = Path::new("./data/ch02/hightemp.txt");
-
-        let commander = Commander::new(load_path);
-        let res = commander.extract_first_second_row();
-        assert_eq!(res.0, commander.extract_row(0));
-        assert_eq!(res.1, commander.extract_row(1));
     }
 }
