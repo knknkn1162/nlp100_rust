@@ -83,6 +83,7 @@ impl<'a> FileExtractor<'a> {
         let _ = writer.write(res.as_bytes()).unwrap();
     }
 
+    /// ch02.14 take first ${num} lines
     pub fn head(&self, n: usize)->String {
         let s = self.read().unwrap();
         s.lines().take(n).collect::<Vec<_>>().join("\n")
