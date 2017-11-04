@@ -87,14 +87,24 @@ impl Commander {
         String::from_utf8_lossy(&res.stdout).trim().to_string()
     }
 
-    /// ch02.14 `head -n ${file}`
-    pub fn head(&self, n: usize)->String {
-        let res = Command::new("head")
+    /// helper for ch02. 14&15
+    fn take(&self, n: usize, pos: &str)->String {
+        let res = Command::new(pos)
             .args(&["-n", format!("{}", n).as_str()])
             .arg(&self.path)
             .output().expect("fail to execute head command");
 
         String::from_utf8_lossy(&res.stdout).trim().to_string()
+    }
+
+    /// ch02.14 `head -n ${file}`
+    pub fn head(&self, n: usize)->String {
+        self.take(n, "head")
+    }
+
+    /// ch02.15 `tail -n ${file}
+    pub fn tail(&self, n: usize)->String {
+        self.take(n, "tail")
     }
 }
 
