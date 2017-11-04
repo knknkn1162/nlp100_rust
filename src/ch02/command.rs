@@ -86,13 +86,25 @@ impl Commander {
 
         String::from_utf8_lossy(&res.stdout).trim().to_string()
     }
+
+    /// ch02.14 `head -n ${file}`
+    pub fn head(&self, n: usize)->String {
+        let res = Command::new("head")
+            .args(&["-n", format!("{}", n).as_str()])
+            .arg(&self.path)
+            .output().expect("fail to execute head command");
+
+        String::from_utf8_lossy(&res.stdout).trim().to_string()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     extern crate env_logger;
+    extern crate getopts;
 
+    use self::getopts::Options;
     /// env_logger output is controlled by RUST_LOG environmental variable
     /// to debug only to this module, set `RUST_LOG=natural_lang::ch02::command=debug` in Environment variable.
     /// before save file, confirm existance in file or create dir in fs::create_dir method.
@@ -156,5 +168,48 @@ mod tests {
             (&mut res.lines()).next().unwrap(),
             "高知県\t江川崎"
         )
+    }
+
+    fn print_usage(program: &str, opts: Options) {
+        let brief = format!("Usage: {} FILE [options]", program);
+        print!("{}", opts.usage(&brief));
+    }
+
+    /// with cargo test -- [<OPTIONS>], there seems to be panicked at '"Unrecognized option: \'n\'."'
+    /// so set args directly instead of using env::args()
+    #[test]
+    fn test_head() {
+        // let args = env::args()::collect::<Vec<String>>();
+        let args = vec!["program", "-n", "5", "./data/ch02/hightemp.txt"];
+
+        let program = args[0].clone();
+
+        let mut opts = Options::new();
+        opts.optopt("n", "num", "set first ${num} rows", "NUMBER");
+        opts.optflag("h", "help", "print this help menu");
+
+        let matches = opts.parse(&args[1..]).unwrap();
+
+        if matches.opt_present("h") {
+            print_usage(&program, opts);
+            return;
+        }
+
+        let n = matches
+            .opt_str("n")
+            .expect("invalid number")
+            .parse::<usize>()
+            .unwrap();
+        let input = matches.free.first().unwrap();
+
+        let commander = Commander::new(input);
+
+        let res = commander.head(n);
+        assert_eq!(
+            res,
+            "高知県\t江川崎\t41\t2013-08-12\n埼玉県\t熊谷\t40.9\t2007-08-16\n\
+            岐阜県\t多治見\t40.9\t2007-08-16\n山形県\t山形\t40.8\t1933-07-25\n\
+            山梨県\t甲府\t40.7\t2013-08-10"
+        );
     }
 }
