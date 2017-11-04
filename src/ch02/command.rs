@@ -1,5 +1,6 @@
 use std::process::{Command, Stdio};
-use std::io::{Read, Write};
+use std::io::{BufReader, Read, Write}; // Read is used for read_to_string
+use std::fs::File;
 use std::path::Path;
 
 pub struct Commander {path: String}
@@ -67,6 +68,16 @@ impl Commander {
         }
         let res = tr.wait_with_output().unwrap().stdout;
         String::from_utf8(res).expect("contain invalid utf-8 character")
+    }
+
+    /// preparation to ch01_12
+    fn extract_row<T: AsRef<Path>>(&self, n: usize, file: &T) {
+        let f = File::create(file).unwrap();
+        let _ = Command::new("cut")
+            .args(&["-f", &format!("{}", n)])
+            .arg(&self.path)
+            .stdout(f)
+            .output().expect("fail to execute cut command");
     }
 }
 
