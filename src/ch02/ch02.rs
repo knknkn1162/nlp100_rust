@@ -208,4 +208,18 @@ mod test {
 
         assert!(save_file.exists());
     }
+
+    #[test]
+    fn test_head() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        let n = 5;
+
+        let commander = Commander::new(load_path);
+        assert_eq!(
+            fxt.head(n),
+            commander.head(n)
+        )
+    }
 }
