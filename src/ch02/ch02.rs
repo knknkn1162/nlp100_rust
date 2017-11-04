@@ -80,7 +80,7 @@ impl<'a> FileExtractor<'a> {
         let res = FileExtractor::merge(&line1, &line2);
 
         let mut writer = BufWriter::new(File::create(save_file).unwrap());
-        let _ = writer.write(res.as_bytes()).unwrap();
+        let _ = writer.write_all(res.as_bytes()).unwrap();
     }
 
     /// ch02.14 take first ${num} lines
