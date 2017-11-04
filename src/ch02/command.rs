@@ -77,6 +77,15 @@ impl Commander {
 
         String::from_utf8_lossy(&res.stdout).trim().to_string()
     }
+
+    /// ch02.13 merge 2 files
+    pub fn merge<P: AsRef<Path>>(file1: &P, file2: &P)->String {
+        let res = Command::new("paste")
+            .args(&[file1.as_ref(), file2.as_ref()])
+            .output().expect("fail to execute paste command");
+
+        String::from_utf8_lossy(&res.stdout).to_string()
+    }
 }
 
 #[cfg(test)]
@@ -130,5 +139,22 @@ mod tests {
             commander.extract_row(0).lines().next().unwrap(), // take first line
             "高知県"
         );
+    }
+
+    #[test]
+    fn test_merge() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let parent = load_path.parent().unwrap();
+
+        let file1 = parent.join("col1.txt");
+        let file2 = parent.join("col2.txt");
+
+        let res = Commander::merge(&file1, &file2);
+        debug!("{:?}", res);
+        assert_eq!(
+            (&mut res.lines()).next().unwrap(),
+            "高知県\t江川崎"
+        )
     }
 }
