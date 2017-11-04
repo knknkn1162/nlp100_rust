@@ -110,11 +110,17 @@ mod test {
         // assume that file doesn't exist
         let _ = ::std::fs::remove_file(&save_path);
 
-        let commander = Commander::new(load_path);
-
         fxt.extract_row(0, &save_path);
 
         assert!(save_path.exists());
+
+        let mut line = String::new();
+        let mut reader = BufReader::new(File::open(save_path).unwrap());
+        let _ = reader.read_to_string(&mut line);
+
+        let commander = Commander::new(load_path);
+
+        assert_eq!(commander.extract_row(0), line);
     }
 
     #[test]
