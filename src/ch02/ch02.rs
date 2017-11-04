@@ -165,4 +165,42 @@ mod test {
 
         assert_eq!(commander.extract_row(1), line);
     }
+
+    #[test]
+    fn test_merge() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+
+        let lines1 = fxt.extract_row(0);
+        let lines2 = fxt.extract_row(1);
+
+        let commander = Commander::new(load_path);
+        let parent = load_path.parent().unwrap();
+
+        let file1 = parent.join("col1.txt");
+        let file2 = parent.join("col2.txt");
+        assert_eq!(
+            FileExtractor::merge(&lines1, &lines2),
+            Commander::merge(&file1, &file2)
+        )
+    }
+
+    #[test]
+    fn test_save_merge() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let parent = load_path.parent().unwrap();
+
+        let file1 = parent.join("col1.txt");
+        let file2 = parent.join("col2.txt");
+        let save_file = parent.join("col12.txt");
+
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        fxt.save_first_second_row(&file1, &file2);
+
+        // assume that save_file doesn't exist.
+        let _ = ::std::fs::remove_file(&save_file);
+        FileExtractor::save_merge(&file1, &file2, &save_file);
+
+        assert!(save_file.exists());
+    }
 }
