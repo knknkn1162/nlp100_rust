@@ -1,5 +1,5 @@
 use std::process::{Command, Stdio};
-use std::io::{BufReader, Read, Write}; // Read is used for read_to_string
+use std::io::{BufReader, BufRead, Read, Write}; // Read is used for read_to_string
 use std::fs::File;
 use std::path::Path;
 
@@ -144,10 +144,10 @@ mod tests {
 
         let f = File::open(save_path).unwrap();
         let mut line = String::new();
-        let _ = BufReader::new(f).read_to_string(&mut line);
+        let _ = BufReader::new(f).read_line(&mut line);
 
         assert_eq!(
-            line.lines().take(1).collect::<String>(),
+            line.trim(), // trim line to remove '\n'
             "高知県"
         );
     }
