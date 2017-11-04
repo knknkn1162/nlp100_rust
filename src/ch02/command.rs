@@ -355,4 +355,18 @@ mod tests {
             split_num
         );
     }
+
+    #[test]
+    fn test_uniq_first_row() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let commander = Commander::new(load_path);
+
+        let res = commander.uniq_first_row();
+
+        assert_eq!(
+            commander.uniq_first_row(),
+            "千葉県\n和歌山県\n埼玉県\n大阪府\n山形県\n山梨県\n岐阜県\n愛媛県\n愛知県\n群馬県\n静岡県\n高知県"
+        )
+    }
 }
