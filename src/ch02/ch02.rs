@@ -230,4 +230,18 @@ mod test {
             commander.head(n)
         )
     }
+
+    #[test]
+    fn test_tail() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        let n = 5;
+
+        let commander = Commander::new(load_path);
+        assert_eq!(
+            fxt.tail(n),
+            commander.tail(n)
+        )
+    }
 }
