@@ -100,4 +100,41 @@ mod test {
             commander.replace_tab_to_space()
         )
     }
+
+    #[test]
+    fn test_ch02_12_helper_extract_row() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+
+        let save_path = load_path.parent().unwrap().join("col1.txt");
+        // assume that file doesn't exist
+        let _ = ::std::fs::remove_file(&save_path);
+
+        let commander = Commander::new(load_path);
+
+        fxt.extract_row(0, &save_path);
+
+        assert!(save_path.exists());
+    }
+
+    #[test]
+    fn test_ch02_12_extract_first_second_row() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let parent = load_path.parent().unwrap();
+
+        let file1 = parent.join("col1.txt");
+        let file2 = parent.join("col2.txt");
+
+        let _ = vec![&file1, &file2]
+            .into_iter()
+            .map(|fpath| ::std::fs::remove_file(fpath)).collect::<Vec<_>>();
+
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        fxt.extract_first_second_row(&file1, &file2);
+
+        assert!(file1.exists());
+        assert!(file2.exists());
+
+
+    }
 }
