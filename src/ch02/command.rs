@@ -71,21 +71,21 @@ impl Commander {
     }
 
     /// preparation to ch02_12
-    fn extract_row<T: AsRef<Path>>(&self, n: usize, file: &T) {
-        let f = File::create(file).unwrap();
-        let _ = Command::new("cut")
-            .args(&["-f", &format!("{}", n)])
+    fn extract_row(&self, n: usize)->String {
+        let res = Command::new("cut")
+            .args(&["-f", &format!("{}", n+1)]) // start at 0
             .arg(&self.path)
-            .stdout(f)
             .output().expect("fail to execute cut command");
+
+        String::from_utf8(res.stdout).expect("contain invalid utf-8 character")
     }
     /// ch02_12; extract first and second row and save each file.
-    fn extract_first_second_row<T: AsRef<Path>>(&self, file1: &T, file2: &T) {
-        vec![(file1, 1), (file2, 2)]
-            .iter().map(|&(f, n)|
-                self.extract_row(n, f)
-            )
-            .collect::<Vec<_>>();
+    fn extract_first_second_row(&self)->(String, String) {
+        let mut res = (0..2)
+            .map(|n|
+                self.extract_row(n as usize)
+            );
+        (res.next().unwrap(), res.next().unwrap())
     }
 }
 
