@@ -133,6 +133,7 @@ mod tests {
     use super::*;
     extern crate env_logger;
     extern crate getopts;
+    extern crate glob;
 
     use self::getopts::Options;
     /// env_logger output is controlled by RUST_LOG environmental variable
@@ -279,6 +280,58 @@ mod tests {
             山梨県\t大月\t39.9\t1990-07-19\n\
             山形県\t鶴岡\t39.9\t1978-08-03\n\
             愛知県\t名古屋\t39.9\t1942-08-02"
+        );
+    }
+
+    #[test]
+    fn test_get_split_line_count() {
+        assert_eq!(get_split_line_count(9, 3), 3);
+        assert_eq!(get_split_line_count(10, 3), 4);
+        assert_eq!(get_split_line_count(11, 3), 4);
+    }
+
+    #[test]
+    fn test_split() {
+        let args = vec!["program", "--line", "3", "./data/ch02/hightemp.txt", "./data/ch02/split_"];
+
+        let program = args[0].clone();
+
+
+        let mut opts = Options::new();
+        opts.optopt("l", "line", "set first ${num} rows", "NUMBER");
+        opts.optflag("h", "help", "print this help menu");
+
+        let matches = opts.parse(&args[1..]).unwrap();
+
+        if matches.opt_present("h") {
+            print_usage(&program, opts);
+            return;
+        }
+
+        let split_num = matches
+            .opt_str("l")
+            .unwrap()
+            .parse::<usize>()
+            .expect("invalid number");
+
+        let input = &matches.free[0..2];
+
+        let save_path = Path::new(&input[1]);
+
+        let commander = Commander::new(&input[0]);
+
+        //
+        commander.split(split_num, &input[1]);
+        let filename = format!("{}{}", save_path.file_name().unwrap().to_str().unwrap(), '*');
+
+        use self::glob::glob;
+
+        // check that all ok and the length of vector is equal to split_num
+        assert_eq!(
+            glob(save_path.parent().unwrap().join(&filename).to_str().unwrap())
+                .expect("failed to read glob pattern")
+                .collect::<Result<Vec<_>,_>>().unwrap().len(),
+            split_num
         );
     }
 }
