@@ -122,6 +122,8 @@ impl<'a> FileExtractor<'a> {
 mod test {
     use ch02::command::Commander;
     use super::*;
+    extern crate glob;
+
     #[test]
     fn test_read() {
         let fext = FileExtractor {path: "./data/ch02/hightemp.txt"};
@@ -262,5 +264,45 @@ mod test {
             fxt.tail(n),
             commander.tail(n)
         )
+    }
+
+    #[test]
+    fn test_split() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+
+        let n = 3;
+        let vs = fxt.split(n);
+
+        assert_eq!(n, vs.len());
+
+        let commander = Commander::new(load_path);
+
+        let save_path= Path::new("./data/ch02/split_");
+        commander.split(n, &save_path);
+
+        let filename = format!("{}{}", save_path.file_name().unwrap().to_str().unwrap(), '*');
+
+        use self::glob::glob;
+        let vfs = glob(save_path.parent().unwrap().join(&filename).to_str().unwrap())
+            .expect("failed to read glob pattern")
+            .collect::<Result<Vec<_>,_>>()
+            .unwrap();
+
+        use std::collections::HashSet;
+        let hashset = vfs.iter().map(|file| {
+            let mut reader = BufReader::new(File::open(file).unwrap());
+            let mut s = String::new();
+            let _ = reader.read_to_string(&mut s).unwrap();
+            s.trim().to_string() // to trim '\n'
+        }).collect::<HashSet<_>>();
+
+        // compare result of split command with FileExtractor::split
+        assert_eq!(
+            vs.into_iter().collect::<HashSet<_>>(),
+            hashset
+        )
+
     }
 }
