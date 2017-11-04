@@ -222,4 +222,43 @@ mod tests {
             山梨県\t甲府\t40.7\t2013-08-10"
         );
     }
+
+    #[test]
+    fn test_tail() {
+        // let args = env::args()::collect::<Vec<String>>();
+        let args = vec!["program", "-n", "5", "./data/ch02/hightemp.txt"];
+
+        let program = args[0].clone();
+
+        let mut opts = Options::new();
+        opts.optopt("n", "num", "set first ${num} rows", "NUMBER");
+        opts.optflag("h", "help", "print this help menu");
+
+        let matches = opts.parse(&args[1..]).unwrap();
+
+        if matches.opt_present("h") {
+            print_usage(&program, opts);
+            return;
+        }
+
+        let n = matches
+            .opt_str("n")
+            .expect("invalid number")
+            .parse::<usize>()
+            .unwrap();
+        let input = matches.free.first().unwrap();
+
+        let commander = Commander::new(input);
+
+        let res = commander.tail(n);
+        println!("{:?}", res);
+        assert_eq!(
+            res,
+            "埼玉県\t鳩山\t39.9\t1997-07-05\n\
+            大阪府\t豊中\t39.9\t1994-08-08\n\
+            山梨県\t大月\t39.9\t1990-07-19\n\
+            山形県\t鶴岡\t39.9\t1978-08-03\n\
+            愛知県\t名古屋\t39.9\t1942-08-02"
+        );
+    }
 }
