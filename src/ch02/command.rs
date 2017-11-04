@@ -6,8 +6,7 @@ use std::path::Path;
 pub struct Commander {path: String}
 
 impl Commander {
-
-    pub fn new<P: AsRef<Path>>(save_path: P)->Commander {
+    pub fn new<P: AsRef<Path>>(save_path: P) -> Commander {
         Commander {
             path: save_path.as_ref().to_str().expect("contains invalid utf-8 character").to_owned()
         }
@@ -30,7 +29,7 @@ impl Commander {
     }
 
     /// test ch02_10; count lines in the designated file.
-    pub fn count_lines(&self)->Result<usize, ::std::num::ParseIntError> {
+    pub fn count_lines(&self) -> Result<usize, ::std::num::ParseIntError> {
         let output = Command::new("wc")
             .arg("-l")
             .arg(&self.path)
@@ -46,7 +45,7 @@ impl Commander {
     }
 
     /// ch02_11; replace tab to space
-    pub fn replace_tab_to_space(&self)->String {
+    pub fn replace_tab_to_space(&self) -> String {
         let mut cat = Command::new("cat")
             .arg(&self.path)
             .stdout(Stdio::piped())
@@ -63,7 +62,6 @@ impl Commander {
                 let mut buf: Vec<u8> = Vec::new();
                 stdout.read_to_end(&mut buf).unwrap();
                 stdin.write_all(&buf).unwrap();
-
             }
         }
         let res = tr.wait_with_output().unwrap().stdout;
