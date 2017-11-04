@@ -70,7 +70,7 @@ impl Commander {
         String::from_utf8(res).expect("contain invalid utf-8 character")
     }
 
-    /// preparation to ch01_12
+    /// preparation to ch02_12
     fn extract_row<T: AsRef<Path>>(&self, n: usize, file: &T) {
         let f = File::create(file).unwrap();
         let _ = Command::new("cut")
@@ -78,6 +78,14 @@ impl Commander {
             .arg(&self.path)
             .stdout(f)
             .output().expect("fail to execute cut command");
+    }
+    /// ch02_12; extract first and second row and save each file.
+    fn extract_first_second_row<T: AsRef<Path>>(&self, file1: &T, file2: &T) {
+        vec![(file1, 1), (file2, 2)]
+            .iter().map(|&(f, n)|
+                self.extract_row(n, f)
+            )
+            .collect::<Vec<_>>();
     }
 }
 
