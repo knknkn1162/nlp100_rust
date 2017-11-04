@@ -361,4 +361,17 @@ mod test {
         )
 
     }
+
+    #[test]
+    fn test_uniq_first_row() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+
+        let commander = Commander::new(load_path);
+        assert_eq!(
+            fxt.uniq_first_row(),
+            commander.uniq_first_row()
+        );
+    }
 }
