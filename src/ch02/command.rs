@@ -121,6 +121,39 @@ impl Commander {
             .output()
             .expect("fail to execute split command");
     }
+
+    /// ch02.17 take unique items of first row.
+    pub fn uniq_first_row(&self)->String {
+        let cutf1 = Command::new("cut")
+            .args(&["-f", "1"])
+            .arg(&self.path)
+            .stdout(Stdio::piped())
+            .spawn().unwrap();
+
+        let sort = Command::new("sort")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn().unwrap();
+
+        let mut uniq = Command::new("uniq")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn().unwrap();
+
+        let mut buf: Vec<u8> = Vec::new();
+        cutf1.stdout.unwrap().read_to_end(&mut buf).unwrap();
+        sort.stdin.unwrap().write_all(&buf).unwrap();
+        let mut buf: Vec<u8> = Vec::new();
+        sort.stdout.unwrap().read_to_end(&mut buf).unwrap();
+        if let Some(ref mut stdin) = uniq.stdin {
+            stdin.write_all(&buf).unwrap();
+        }
+        // wait_with_output(self) -> Result<Output>
+        let res = uniq.wait_with_output().unwrap().stdout;
+        String::from_utf8_lossy(&res).trim().to_string()
+
+    }
+
 }
 
 #[cfg(test)]
