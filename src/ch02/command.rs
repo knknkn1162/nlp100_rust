@@ -106,6 +106,26 @@ impl Commander {
     pub fn tail(&self, n: usize)->String {
         self.take(n, "tail")
     }
+
+    /// ch02.16 split n files.
+    pub fn split<P: AsRef<Path>>(&self, n: usize, dst: &P) {
+        let size = self.count_lines().unwrap();
+        let lines = get_split_line_count(size, n);
+        debug!("split per {} lines", lines);
+        assert!(lines >0);
+        let res = Command::new("split")
+            .args(&["-l", &format!("{}", lines)])
+            .arg(&self.path) // src
+            .arg(dst.as_ref().to_str().unwrap()) // dst
+            .output()
+            .expect("fail to execute split command");
+    }
+}
+
+/// helper for ch02.16,
+fn get_split_line_count(size: usize, split_num: usize)->usize {
+    let res: usize = size/split_num;
+    if size%split_num==0 {res} else {res+1}
 }
 
 #[cfg(test)]
