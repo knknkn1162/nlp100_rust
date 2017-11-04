@@ -150,6 +150,19 @@ mod tests {
             line.lines().take(1).collect::<String>(),
             "高知県"
         );
+    }
 
+    #[test]
+    fn test_extract_first_second_row() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let parent = load_path.parent().unwrap();
+        let file1 = parent.join("col1.txt");
+        let file2 = parent.join("col2.txt");
+
+        let commander = Commander::new(load_path);
+        commander.extract_first_second_row(&file1, &file2);
+
+        assert!(file1.exists());
+        assert!(file2.exists());
     }
 }
