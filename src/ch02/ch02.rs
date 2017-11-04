@@ -34,10 +34,8 @@ impl<'a> FileExtractor<'a> {
     }
 
     /// helper for ch02.12
-    fn extract_row<T: AsRef<Path>>(&self, n: usize, file: &T)->String {
+    fn extract_row(&self, n: usize)->String {
         let s = self.read().unwrap();
-
-        let file = File::create(file).unwrap();
         s.lines()
             .map(|line| {
                 line.split('\t')
@@ -56,7 +54,7 @@ impl<'a> FileExtractor<'a> {
             .map(|(idx, file)| {
                 let f = File::create(file).unwrap();
                 let mut buffer = BufWriter::new(f);
-                buffer.write_all(self.extract_row(idx, file).as_bytes())
+                buffer.write_all(self.extract_row(idx).as_bytes())
             })
             .collect::<Vec<_>>();
     }
