@@ -89,6 +89,13 @@ impl<'a> FileExtractor<'a> {
         s.lines().take(n).collect::<Vec<_>>().join("\n")
     }
 
+    pub fn tail(&self, n: usize)->String {
+        let s = self.read().unwrap();
+
+        let mut r = s.lines().rev().take(n).collect::<Vec<_>>();
+        r.reverse();
+        r.join("\n")
+    }
 
 }
 
