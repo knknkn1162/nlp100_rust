@@ -60,15 +60,15 @@ impl<'a> FileExtractor<'a> {
     }
 
     /// helper for ch03.13; merge col1.txt and col2.txt
-    fn merge(&self, row1: &str, row2: &str)-> String {
+    fn merge(row1: &str, row2: &str)-> String {
         row1.lines()
             .zip(row2.lines())
-            .map(|(item1, item2)| format!("{:?}\t{:?}", item1, item2))
+            .map(|(item1, item2)| format!("{}{}{}", item1, '\t', item2))
             .collect::<Vec<_>>().join("\n")
     }
 
     /// ch03.13; save result of merge method.
-    pub fn save_merge<T: AsRef<Path>>(&self, file1: &T, file2: &T, save_file: &T) {
+    pub fn save_merge<T: AsRef<Path>>(file1: &T, file2: &T, save_file: &T) {
         let mut reader = BufReader::new(File::open(file1).unwrap());
         let mut line1 = String::new();
         let _ = reader.read_to_string(&mut line1).unwrap();
@@ -77,10 +77,10 @@ impl<'a> FileExtractor<'a> {
         let mut line2 = String::new();
         let _ = reader.read_to_string(&mut line2).unwrap();
 
-        let res = self.merge(&line1, &line2);
+        let res = FileExtractor::merge(&line1, &line2);
 
         let mut writer = BufWriter::new(File::create(save_file).unwrap());
-        let _ = writer.write(res.as_bytes());
+        let _ = writer.write(res.as_bytes()).unwrap();
     }
 
 
