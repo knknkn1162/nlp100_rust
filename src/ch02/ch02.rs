@@ -116,6 +116,36 @@ impl<'a> FileExtractor<'a> {
         res
     }
 
+    /// ch02.16 split ${n} files
+    /// return is success count of saving files.
+    pub fn save_split<P: AsRef<Path>>(&self, n: usize, dst: &P)->usize {
+        let vs = self.split(n);
+        let save_path = dst.as_ref();
+        assert!(n <= 24); // assume that limit is the number of alphabet.
+        let filenames =
+            (b'a'..b'z').map(|s|
+                format!(
+                    "{}{}",
+                    save_path.file_name().unwrap().to_str().unwrap(),
+                    format!("{}{}", 'a', s as char)
+                )
+            )
+                .take(n).collect::<Vec<String>>();
+
+
+        // write files
+        vs.iter()
+            .zip(filenames.iter())
+            .map(|(s, file)| {
+                let newfile = save_path.parent().unwrap().join(&file);
+                let mut writer = BufWriter::new(File::create(newfile).unwrap());
+                writer.write(s.as_bytes())
+            })
+            .collect::<Result<Vec<_>,_>>().unwrap().len()
+
+
+    }
+
 }
 
 #[cfg(test)]
