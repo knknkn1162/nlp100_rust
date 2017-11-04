@@ -89,6 +89,7 @@ impl<'a> FileExtractor<'a> {
         s.lines().take(n).collect::<Vec<_>>().join("\n")
     }
 
+    /// ch02.15 tail last ${num} lines
     pub fn tail(&self, n: usize)->String {
         let s = self.read().unwrap();
 

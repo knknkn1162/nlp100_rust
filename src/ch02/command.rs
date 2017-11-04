@@ -110,7 +110,8 @@ impl Commander {
     /// ch02.16 split n files.
     pub fn split<P: AsRef<Path>>(&self, n: usize, dst: &P) {
         let size = self.count_lines().unwrap();
-        let lines = get_split_line_count(size, n);
+        use ch02::util;
+        let lines = util::get_split_line_count(size, n);
         debug!("split per {} lines", lines);
         assert!(lines >0);
         let res = Command::new("split")
@@ -120,12 +121,6 @@ impl Commander {
             .output()
             .expect("fail to execute split command");
     }
-}
-
-/// helper for ch02.16,
-fn get_split_line_count(size: usize, split_num: usize)->usize {
-    let res: usize = size/split_num;
-    if size%split_num==0 {res} else {res+1}
 }
 
 #[cfg(test)]
@@ -281,13 +276,6 @@ mod tests {
             山形県\t鶴岡\t39.9\t1978-08-03\n\
             愛知県\t名古屋\t39.9\t1942-08-02"
         );
-    }
-
-    #[test]
-    fn test_get_split_line_count() {
-        assert_eq!(get_split_line_count(9, 3), 3);
-        assert_eq!(get_split_line_count(10, 3), 4);
-        assert_eq!(get_split_line_count(11, 3), 4);
     }
 
     #[test]
