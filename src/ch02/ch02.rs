@@ -113,15 +113,12 @@ mod test {
 
         fxt.extract_row(0, &save_path);
 
-        assert!(save_path.exists());
-
-        let mut line = String::new();
-        let mut reader = BufReader::new(File::open(save_path).unwrap());
-        let _ = reader.read_to_string(&mut line);
-
         let commander = Commander::new(load_path);
 
-        assert_eq!(commander.extract_row(0), line);
+        assert_eq!(
+            commander.extract_row(0),
+            fxt.extract_row(0, &save_path)
+        );
     }
 
     #[test]
@@ -129,23 +126,21 @@ mod test {
         let load_path = Path::new("./data/ch02/hightemp.txt");
         let parent = load_path.parent().unwrap();
 
-        // assume that file doesn't exist
         let file1 = parent.join("col1.txt");
         let file2 = parent.join("col2.txt");
 
-        let _ = ::std::fs::remove_file(&file1);
-        let _ = ::std::fs::remove_file(&file2);
-
+        // assume that file doesn't exist
         let _ = vec![&file1, &file2]
             .into_iter()
             .map(|fpath| ::std::fs::remove_file(fpath)).collect::<Vec<_>>();
 
         let fxt = FileExtractor {path: load_path.to_str().unwrap()};
-        fxt.extract_first_second_row(&file1, &file2);
+        fxt.save_first_second_row(&file1, &file2);
 
         assert!(file1.exists());
         assert!(file2.exists());
 
+        // confirm that content of file2 is equivalent to cut command.
         let mut line = String::new();
         let mut reader = BufReader::new(File::open(file2).unwrap());
         let _ = reader.read_to_string(&mut line);
