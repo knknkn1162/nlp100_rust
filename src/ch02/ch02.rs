@@ -128,8 +128,12 @@ mod test {
         let load_path = Path::new("./data/ch02/hightemp.txt");
         let parent = load_path.parent().unwrap();
 
+        // assume that file doesn't exist
         let file1 = parent.join("col1.txt");
         let file2 = parent.join("col2.txt");
+
+        let _ = ::std::fs::remove_file(&file1);
+        let _ = ::std::fs::remove_file(&file2);
 
         let _ = vec![&file1, &file2]
             .into_iter()
@@ -141,6 +145,12 @@ mod test {
         assert!(file1.exists());
         assert!(file2.exists());
 
+        let mut line = String::new();
+        let mut reader = BufReader::new(File::open(file2).unwrap());
+        let _ = reader.read_to_string(&mut line);
 
+        let commander = Commander::new(load_path);
+
+        assert_eq!(commander.extract_row(1), line);
     }
 }
