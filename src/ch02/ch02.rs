@@ -1,4 +1,4 @@
-use std::io::{BufReader, Read, LineWriter, Write};
+use std::io::{BufReader, Read, BufWriter, Write};
 use std::fs::File;
 use std::io;
 use std::path::Path;
@@ -34,30 +34,31 @@ impl<'a> FileExtractor<'a> {
     }
 
     /// helper for ch02.12
-    fn extract_row<T: AsRef<Path>>(&self, n: usize, file: &T) {
+    fn extract_row<T: AsRef<Path>>(&self, n: usize, file: &T)->String {
         let s = self.read().unwrap();
 
         let file = File::create(file).unwrap();
-        let data = s.lines()
+        s.lines()
             .map(|line| {
                 line.split('\t')
                     .nth(n)
                     .unwrap()
             })
-            .collect::<Vec<_>>().join("\n");
-        let _ = LineWriter::new(file).write(data.as_bytes());
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 
     /// ch02.12; save first and second row in each file
-    pub fn extract_first_second_row<T: AsRef<Path>>(&self, file1: &T, file2: &T) {
-        let s = self.read().unwrap();
-
+    pub fn save_first_second_row<T: AsRef<Path>>(&self, file1: &T, file2: &T) {
         vec![file1, file2]
             .into_iter()
             .enumerate()
-            .map(|(idx, file)|
-                self.extract_row(idx, file)
-            ).collect::<Vec<_>>();
+            .map(|(idx, file)| {
+                let f = File::create(file).unwrap();
+                let mut buffer = BufWriter::new(f);
+                buffer.write_all(self.extract_row(idx, file).as_bytes())
+            })
+            .collect::<Vec<_>>();
     }
 
 
