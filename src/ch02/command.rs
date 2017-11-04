@@ -117,7 +117,6 @@ mod tests {
     fn test_count_lines() {
         let save_path = Path::new("./data/ch02/hightemp.txt");
         let commander = Commander::new(save_path);
-
         assert_eq!(commander.count_lines().unwrap(), 24);
     }
 
@@ -137,17 +136,8 @@ mod tests {
     fn test_extract_row() {
         let load_path = Path::new("./data/ch02/hightemp.txt");
         let commander = Commander::new(load_path);
-        let save_path = load_path.parent().unwrap().join("col1.txt");
-        commander.extract_row(1, &save_path);
-
-        assert!(save_path.exists());
-
-        let f = File::open(save_path).unwrap();
-        let mut line = String::new();
-        let _ = BufReader::new(f).read_line(&mut line);
-
         assert_eq!(
-            line.trim(), // trim line to remove '\n'
+            commander.extract_row(0).lines().next().unwrap(), // take first line
             "高知県"
         );
     }
@@ -155,14 +145,10 @@ mod tests {
     #[test]
     fn test_extract_first_second_row() {
         let load_path = Path::new("./data/ch02/hightemp.txt");
-        let parent = load_path.parent().unwrap();
-        let file1 = parent.join("col1.txt");
-        let file2 = parent.join("col2.txt");
 
         let commander = Commander::new(load_path);
-        commander.extract_first_second_row(&file1, &file2);
-
-        assert!(file1.exists());
-        assert!(file2.exists());
+        let res = commander.extract_first_second_row();
+        assert_eq!(res.0, commander.extract_row(0));
+        assert_eq!(res.1, commander.extract_row(1));
     }
 }
