@@ -1,6 +1,7 @@
-use std::io::{BufReader, Read};
+use std::io::{BufReader, Read, LineWriter, Write};
 use std::fs::File;
 use std::io;
+use std::path::Path;
 
 struct FileExtractor<'a> {path: &'a str}
 
@@ -31,6 +32,25 @@ impl<'a> FileExtractor<'a> {
         let s = self.read().unwrap();
         s.replace("\t", " ")
     }
+
+    /// helper for ch02.11
+    fn extract_row<T: AsRef<Path>>(&self, n: usize, file: &T) {
+        let s = self.read().unwrap();
+
+        let file = File::create(file).unwrap();
+        let mut file = LineWriter::new(file);
+        s.lines()
+            .map(|line| {
+                let res = line.split('\t')
+                    .nth(n)
+                    .unwrap();
+                file.write(res.as_bytes()).unwrap()
+            })
+            .collect::<Vec<_>>();
+
+    }
+
+
 }
 
 #[cfg(test)]
