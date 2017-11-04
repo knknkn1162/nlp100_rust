@@ -146,6 +146,15 @@ impl<'a> FileExtractor<'a> {
 
     }
 
+    /// ch02.17 collect unique items in first row.
+    pub fn uniq_first_row(&self)->String {
+        let s = self.extract_row(0);
+        let mut lines = s.lines().collect::<Vec<&str>>();
+        (&mut lines).sort_unstable();
+        (&mut lines).dedup();
+        lines.join("\n")
+    }
+
 }
 
 #[cfg(test)]
