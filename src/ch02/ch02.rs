@@ -105,17 +105,11 @@ mod test {
         let load_path = Path::new("./data/ch02/hightemp.txt");
         let fxt = FileExtractor {path: load_path.to_str().unwrap()};
 
-        let save_path = load_path.parent().unwrap().join("col1.txt");
-        // assume that file doesn't exist
-        let _ = ::std::fs::remove_file(&save_path);
-
-        fxt.extract_row(0, &save_path);
-
         let commander = Commander::new(load_path);
 
         assert_eq!(
             commander.extract_row(0),
-            fxt.extract_row(0, &save_path)
+            fxt.extract_row(0)
         );
     }
 
