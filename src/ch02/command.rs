@@ -135,6 +135,8 @@ impl Commander {
             .stdout(Stdio::piped())
             .spawn().unwrap();
 
+        // note that sort and uniq cannot be swapped.
+        // uniq command makes duplicated items in sequence single!
         let mut uniq = Command::new("uniq")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
