@@ -84,7 +84,7 @@ impl Commander {
             .args(&[file1.as_ref(), file2.as_ref()])
             .output().expect("fail to execute paste command");
 
-        String::from_utf8_lossy(&res.stdout).to_string()
+        String::from_utf8_lossy(&res.stdout).trim().to_string()
     }
 }
 
