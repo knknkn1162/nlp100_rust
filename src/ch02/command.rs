@@ -123,6 +123,25 @@ mod tests {
             res.lines().take(1).collect::<String>(),
             "高知県 江川崎 41 2013-08-12"
         )
+    }
+
+    #[test]
+    fn test_extract_row() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let commander = Commander::new(load_path);
+        let save_path = load_path.parent().unwrap().join("col1.txt");
+        commander.extract_row(1, &save_path);
+
+        assert!(save_path.exists());
+
+        let f = File::open(save_path).unwrap();
+        let mut line = String::new();
+        let _ = BufReader::new(f).read_to_string(&mut line);
+
+        assert_eq!(
+            line.lines().take(1).collect::<String>(),
+            "高知県"
+        );
 
     }
 }
