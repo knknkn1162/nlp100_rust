@@ -393,4 +393,23 @@ mod test {
             commander.uniq_first_row()
         );
     }
+
+    #[test]
+    fn test_sort_in_descending() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        let commander = Commander::new(load_path);
+
+        let n = 5;
+
+        eprintln!("{:?}",
+                 &fxt.sort_in_descending(3)[..n]
+        );
+        // sort command is unstable, so maybe different from sort in rust.
+        eprintln!("{:?}",
+                 commander.sort_in_descending(3).lines().take(n).collect::<Vec<_>>()
+        );
+
+    }
 }
