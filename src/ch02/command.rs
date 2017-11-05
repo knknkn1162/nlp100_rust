@@ -383,4 +383,23 @@ mod tests {
             "千葉県\n和歌山県\n埼玉県\n大阪府\n山形県\n山梨県\n岐阜県\n愛媛県\n愛知県\n群馬県\n静岡県\n高知県"
         )
     }
+
+    #[test]
+    fn test_sort_in_descending() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let commander = Commander::new(load_path);
+
+        let res = commander.sort_in_descending(3);
+
+        assert_eq!(
+            res.lines().take(5).collect::<Vec<&str>>(),
+            vec!["高知県\t江川崎\t41\t2013-08-12",
+                 "岐阜県\t多治見\t40.9\t2007-08-16",
+                 "埼玉県\t熊谷\t40.9\t2007-08-16",
+                 "山形県\t山形\t40.8\t1933-07-25",
+                 "山梨県\t甲府\t40.7\t2013-08-10"]
+        )
+
+    }
 }
