@@ -447,6 +447,26 @@ mod test {
         eprintln!("{:?}",
                  commander.sort_in_descending(3).lines().take(n).collect::<Vec<_>>()
         );
+    }
+
+    #[test]
+    fn test_sort_by_frequent_item() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+
+        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+
+        let res = fxt.sort_by_frequent_item();
+
+        assert_eq!(
+            res.into_iter().take(6).collect::<Vec<String>>(),
+            vec!["群馬県\t館林\t40.3\t2007-08-16",
+                 "群馬県\t上里見\t40.3\t1998-07-04",
+                 "群馬県\t前橋\t40\t2001-07-24",
+                 "山梨県\t甲府\t40.7\t2013-08-10",
+                 "山梨県\t勝沼\t40.5\t2013-08-10",
+                 "山梨県\t大月\t39.9\t1990-07-19"]
+        )
+
 
     }
 }
