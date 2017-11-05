@@ -156,6 +156,18 @@ impl Commander {
 
     }
 
+    /// ch02.18 sort by third columns descendingly
+    /// that means `sort -r -k 3 ./data/ch02/hightemp.txt`
+    pub fn sort_in_descending(&self, key: usize)->String {
+        let res = Command::new("sort")
+            .arg("-r")
+            .args(&["-k", &format!("{}", key)])
+            .arg(&self.path)
+            .output().unwrap();
+
+        String::from_utf8_lossy(&res.stdout).trim().to_string()
+    }
+
 }
 
 #[cfg(test)]
