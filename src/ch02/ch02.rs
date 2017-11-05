@@ -118,12 +118,9 @@ impl<'a> FileExtractor<'a> {
     fn split(&self, n: usize)->Vec<String> {
         let size = self.count_lines();
         let splitn = ::ch02::util::get_split_line_count(size, n);
-        let delimiter = "\n";
         let ss = self.read_lines();
-        ss.windows(splitn)
-            .enumerate()
-            .filter_map(|(idx, ws)|
-                if idx%splitn==0 {Some(ws.join(delimiter))} else {None}
+        ss.chunks(splitn)
+            .map(|ws| ws.join("\n")
             ).collect()
     }
 
