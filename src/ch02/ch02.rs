@@ -155,6 +155,25 @@ impl<'a> FileExtractor<'a> {
         lines.join("\n")
     }
 
+    /// ch02.18 sort by third columns in descending
+    pub fn sort_in_descending(&self, n: usize)->Vec<String> {
+        let s = self.read().unwrap();
+        let delimiter = '\t';
+        let mut lines = s.lines()
+            .map(|line|
+                     line.split(delimiter)
+                         .collect::<Vec<&str>>())
+        .collect::<Vec<Vec<&str>>>();
+
+        lines.sort_by(|line1, line2| {
+            let f1 = line1[n-1].parse::<f32>().unwrap();
+            let f2 = line2[n-1].parse::<f32>().unwrap();
+            f2.partial_cmp(&f1).unwrap() // in descending
+        });
+
+        lines.iter().map(|line| line.join(&format!("{}",delimiter))).collect()
+    }
+
 }
 
 #[cfg(test)]
