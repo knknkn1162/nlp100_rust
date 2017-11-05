@@ -105,3 +105,4 @@ version.texi
 /src/target/
 
 no_llvm_build
+data
