@@ -2,6 +2,7 @@ use std::io::{BufReader, Read, BufWriter, Write};
 use std::fs::File;
 use std::io;
 use std::path::Path;
+use std::collections::HashMap;
 
 struct FileExtractor<'a> {path: &'a str}
 
@@ -171,6 +172,44 @@ impl<'a> FileExtractor<'a> {
 
         lines.iter().map(|line| line.join(&format!("{}",delimiter))).collect()
     }
+
+    /// ch02.19 sort by the number of prefectures listing first columns.
+    pub fn sort_by_frequent_item(&self)->Vec<String> {
+        // generate ordering key
+        let mut hashmap = HashMap::new();
+        for key in self.extract_row(0) {
+            let counter = hashmap.entry(key).or_insert(0);
+            *counter += 1;
+        }
+        let mut partial_ordering = hashmap.into_iter()
+            .collect::<Vec<(String, i32)>>();
+
+        (&mut partial_ordering).sort_by_key(|&(_, count)| -count);
+        // parfect ordering
+        let ordering = partial_ordering.into_iter()
+            .enumerate()
+            .map(|(idx, (s, _))| (s, idx))
+            .collect::<HashMap<String, usize>>();
+        info!("{:?}", ordering);
+
+        let delimiter = "\t";
+        let s = self.read().unwrap();
+        let mut lines = s.lines()
+            .map(|line|
+                line.split(delimiter)
+                    .collect::<Vec<_>>()
+            )
+            .collect::<Vec<_>>();
+        info!("{:?}", lines);
+        (&mut lines).sort_by_key(|line| {
+            ordering[line[0]]
+        });
+
+        lines.into_iter()
+            .map(|s| s.join(delimiter)).collect()
+
+    }
+
 
 }
 
