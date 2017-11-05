@@ -34,16 +34,15 @@ impl<'a> FileExtractor<'a> {
     }
 
     /// helper for ch02.12
-    fn extract_row(&self, n: usize)->String {
+    fn extract_row(&self, n: usize)->Vec<String> {
         let s = self.read().unwrap();
         s.lines()
             .map(|line| {
                 line.split('\t')
                     .nth(n)
-                    .unwrap()
+                    .unwrap().to_string()
             })
-            .collect::<Vec<_>>()
-            .join("\n")
+            .collect()
     }
 
     /// ch02.12; save first and second row in each file
@@ -54,7 +53,7 @@ impl<'a> FileExtractor<'a> {
             .map(|(idx, file)| {
                 let f = File::create(file).unwrap();
                 let mut buffer = BufWriter::new(f);
-                buffer.write_all(self.extract_row(idx).as_bytes())
+                buffer.write_all(self.extract_row(idx).join("\n").as_bytes())
             })
             .collect::<Vec<_>>();
     }
@@ -148,8 +147,7 @@ impl<'a> FileExtractor<'a> {
 
     /// ch02.17 collect unique items in first row.
     pub fn uniq_first_row(&self)->String {
-        let s = self.extract_row(0);
-        let mut lines = s.lines().collect::<Vec<&str>>();
+        let mut lines = self.extract_row(0);
         (&mut lines).sort_unstable();
         (&mut lines).dedup();
         lines.join("\n")
@@ -224,7 +222,7 @@ mod test {
         let commander = Commander::new(load_path);
 
         assert_eq!(
-            commander.extract_row(0),
+            commander.extract_row(0).lines().collect::<Vec<&str>>(),
             fxt.extract_row(0)
         );
     }
@@ -263,8 +261,8 @@ mod test {
         let load_path = Path::new("./data/ch02/hightemp.txt");
         let fxt = FileExtractor {path: load_path.to_str().unwrap()};
 
-        let lines1 = fxt.extract_row(0);
-        let lines2 = fxt.extract_row(1);
+        let lines1 = fxt.extract_row(0).join("\n");
+        let lines2 = fxt.extract_row(1).join("\n");
 
         let commander = Commander::new(load_path);
         let parent = load_path.parent().unwrap();

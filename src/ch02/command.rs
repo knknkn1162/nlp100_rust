@@ -167,7 +167,6 @@ impl Commander {
 
         String::from_utf8_lossy(&res.stdout).trim().to_string()
     }
-
 }
 
 #[cfg(test)]
