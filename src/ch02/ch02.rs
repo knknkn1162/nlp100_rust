@@ -1,8 +1,10 @@
-use std::io::{BufReader, Read, BufWriter, Write};
+use std::io::{BufReader, BufRead, Read, BufWriter, Write};
 use std::fs::File;
 use std::io;
 use std::path::Path;
 use std::collections::HashMap;
+
+use ch02::util;
 
 struct FileExtractor<'a> {path: &'a str}
 
@@ -20,6 +22,20 @@ impl<'a> FileExtractor<'a> {
 
         debug!("{} characters", len);
         Ok(line)
+    }
+
+    /// return Vec<String> instead of String in read method.
+    fn read_lines(&self)->Vec<String> {
+        let mut reader = BufReader::new(File::open(self.path).unwrap());
+        let mut v = vec![];
+        let mut buf;
+        while let Ok(size) = {buf = String::new(); reader.read_line(&mut buf)} {
+            if size==0 {break}
+            util::trim_mut(&mut buf, '\n');
+            v.push(buf); // fn push(&mut self, value: T) the ownership in buf move to v.
+        }
+
+        v
     }
 
     /// ch01.10 count lines
@@ -229,6 +245,18 @@ mod test {
             res.lines().take(1).collect::<String>(),
             "高知県\t江川崎\t41\t2013-08-12"
         );
+    }
+
+    #[test]
+    fn test_read_lines() {
+        let fxt = FileExtractor {path: "./data/ch02/hightemp.txt"};
+
+        let res = fxt.read_lines();
+
+        assert_eq!(
+            res.first().unwrap(),
+            "高知県\t江川崎\t41\t2013-08-12"
+        )
     }
 
     #[test]
