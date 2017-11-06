@@ -13,47 +13,39 @@ impl<'a> FileExtractor<'a> {
         FileExtractor {path: path}
     }
 
-    fn read(&self)->Result<String,io::Error>  {
-        let f = File::open(self.path)?; // read only.
-        let mut reader = BufReader::new(f);
-
-        let mut line = String::new();
-        let len = reader.read_to_string(&mut line)?;
-
-        debug!("{} characters", len);
-        Ok(line)
+    /// helper for read designated file. ignore error
+    fn read(&self)->String {
+        let mut reader = BufReader::new(File::open(self.path).unwrap());
+        let mut buf = String::new();
+        let _ = reader.read_to_string(&mut buf).unwrap();
+        buf
     }
 
     /// return Vec<String> instead of String in read method.
     fn read_lines(&self)->Vec<String> {
-        let mut reader = BufReader::new(File::open(self.path).unwrap());
-        let mut v = vec![];
-        let mut buf;
-        while let Ok(size) = {buf = String::new(); reader.read_line(&mut buf)} {
-            if size==0 {break}
-            util::trim_mut(&mut buf, '\n');
-            v.push(buf); // fn push(&mut self, value: T) the ownership in buf move to v.
-        }
-
-        v
+        let reader = BufReader::new(File::open(self.path).unwrap());
+        reader.lines().collect::<io::Result<Vec<_>>>().unwrap()
     }
-
+/*
     /// ch01.10 count lines
     pub fn count_lines(&self)->usize {
-        let s = self.read().unwrap();
-        s.lines().collect::<Vec<_>>().len()
+        let mut buf = String::new();
+        let _ = self.read(&mut buf).unwrap();
+        buf.lines().collect::<Vec<_>>().len()
     }
 
     /// ch01.11 replace a tab-character to a space
     pub fn replace_tab_to_space(&self)->String {
-        let s = self.read().unwrap();
-        s.replace("\t", " ")
+        let mut buf = String::new();
+        let _ = self.read(&mut buf).unwrap();
+        buf.replace("\t", " ")
     }
 
     /// helper for ch02.12
     fn extract_row(&self, n: usize)->Vec<String> {
-        let s = self.read().unwrap();
-        s.lines()
+        let mut buf = String::new();
+        let _ = self.read(&mut buf).unwrap();
+        buf.lines()
             .map(|line| {
                 line.split('\t')
                     .nth(n)
@@ -218,7 +210,7 @@ impl<'a> FileExtractor<'a> {
 
     }
 
-
+*/
 }
 
 #[cfg(test)]
@@ -230,11 +222,10 @@ mod test {
     #[test]
     fn test_read() {
         let fext = FileExtractor {path: "./data/ch02/hightemp.txt"};
-
-        let res = fext.read().unwrap();
+        let buf = fext.read();
 
         assert_eq!(
-            res.lines().take(1).collect::<String>(),
+            buf.lines().take(1).collect::<String>(),
             "高知県\t江川崎\t41\t2013-08-12"
         );
     }
@@ -250,7 +241,7 @@ mod test {
             "高知県\t江川崎\t41\t2013-08-12"
         )
     }
-
+/*
     #[test]
     fn test_ch02_10_count_lines() {
         let path = "./data/ch02/hightemp.txt";
@@ -486,7 +477,6 @@ mod test {
                  "山梨県\t勝沼\t40.5\t2013-08-10",
                  "山梨県\t大月\t39.9\t1990-07-19"]
         )
-
-
     }
+    */
 }
