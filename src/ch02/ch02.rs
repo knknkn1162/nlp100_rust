@@ -21,10 +21,9 @@ impl<'a> FileExtractor<'a> {
         buf
     }
 
-    /// return Vec<String> instead of String in read method.
-    fn read_lines(&self)->Vec<String> {
-        let reader = BufReader::new(File::open(self.path).unwrap());
-        reader.lines().collect::<io::Result<Vec<_>>>().unwrap()
+    /// return iterator instead of String in read method.
+    fn read_lines(&self)->io::Lines<BufReader<File>> {
+        BufReader::new(File::open(self.path).unwrap()).lines()
     }
 /*
     /// ch01.10 count lines
@@ -234,10 +233,10 @@ mod test {
     fn test_read_lines() {
         let fxt = FileExtractor {path: "./data/ch02/hightemp.txt"};
 
-        let res = fxt.read_lines();
+        let mut res = fxt.read_lines();
 
         assert_eq!(
-            res.first().unwrap(),
+            res.next().unwrap().unwrap(),
             "高知県\t江川崎\t41\t2013-08-12"
         )
     }
