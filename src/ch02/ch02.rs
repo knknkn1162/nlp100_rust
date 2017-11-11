@@ -6,11 +6,11 @@ use std::collections::HashMap;
 
 use ch02::util;
 
-struct FileExtractor<'a> {path: &'a str}
+struct FileExtractor<'a> {path: &'a Path}
 
 impl<'a> FileExtractor<'a> {
-    pub fn new(path: &'a str)-> FileExtractor<'a> {
-        FileExtractor {path: path}
+    pub fn new<P: AsRef<Path>+ ?Sized>(path: &'a P)-> FileExtractor<'a> {
+        FileExtractor {path: path.as_ref()}
     }
 
     /// helper for read designated file. ignore error
@@ -224,7 +224,7 @@ mod test {
 
     #[test]
     fn test_read() {
-        let fext = FileExtractor {path: "./data/ch02/hightemp.txt"};
+        let fext = FileExtractor::new("./data/ch02/hightemp.txt");
         let buf = fext.read();
 
         assert_eq!(
@@ -235,20 +235,20 @@ mod test {
 
     #[test]
     fn test_read_lines() {
-        let fxt = FileExtractor {path: "./data/ch02/hightemp.txt"};
+        let fxt = FileExtractor::new("./data/ch02/hightemp.txt");
 
-        let mut res = fxt.read_lines();
+        let res = fxt.read_lines();
 
         assert_eq!(
             res.iter().next().unwrap(),
             "高知県\t江川崎\t41\t2013-08-12"
         )
     }
-/*
+
     #[test]
     fn test_ch02_10_count_lines() {
         let path = "./data/ch02/hightemp.txt";
-        let fxt = FileExtractor {path: path};
+        let fxt = FileExtractor::new(path);
 
         let commander = Commander::new(path);
         assert_eq!(fxt.count_lines(), commander.count_lines().unwrap())
@@ -257,7 +257,7 @@ mod test {
     #[test]
     fn test_ch02_11_replace_tab_to_space() {
         let path = "./data/ch02/hightemp.txt";
-        let fxt = FileExtractor {path: path};
+        let fxt = FileExtractor::new(path);
 
         let commander = Commander::new(path);
 
@@ -266,7 +266,7 @@ mod test {
             commander.replace_tab_to_space()
         )
     }
-
+/*
     #[test]
     fn test_ch02_12_helper_extract_row() {
         let load_path = Path::new("./data/ch02/hightemp.txt");
