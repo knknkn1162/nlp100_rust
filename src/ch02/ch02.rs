@@ -37,18 +37,18 @@ impl<'a> FileExtractor<'a> {
 
     /// ch02.10 count lines
     pub fn count_lines(&self)->usize {
-        self.read_lines().len()
+        self.read_lines().unwrap().len()
     }
 
     /// ch02.11 replace a tab-character to a space
     pub fn replace_tab_to_space(&self)->String {
-        self.read().replace("\t", " ")
+        self.read().unwrap().replace("\t", " ")
     }
-/*
+
     /// helper for ch02.12
     fn extract_row(&self, n: usize)->Vec<String> {
         let mut buf = String::new();
-        let _ = self.read(&mut buf).unwrap();
+        let buf = self.read().unwrap();
         buf.lines()
             .map(|line| {
                 line.split('\t')
@@ -64,9 +64,8 @@ impl<'a> FileExtractor<'a> {
             .into_iter()
             .enumerate()
             .map(|(idx, file)| {
-                let f = File::create(file).unwrap();
-                let mut buffer = BufWriter::new(f);
-                buffer.write_all(self.extract_row(idx).join("\n").as_bytes())
+                let v = self.extract_row(idx);
+                FileExtractor::write(file, &v).unwrap()
             })
             .collect::<Vec<_>>();
     }
