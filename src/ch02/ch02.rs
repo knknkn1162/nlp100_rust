@@ -13,20 +13,19 @@ impl<'a> FileExtractor<'a> {
     }
 
     /// helper for read designated file. ignore error
-    fn read(&self)->String {
+    fn read(&self)->ioResult<String> {
         let mut reader = BufReader::new(File::open(self.path).unwrap());
         let mut buf = String::new();
-        let _ = reader.read_to_string(&mut buf).unwrap();
-        buf
+        let _ = reader.read_to_string(&mut buf)?;
+        Ok(buf)
     }
 
     /// return iterator instead of String in read method.
-    fn read_lines(&self)->Vec<String> {
-        BufReader::new(File::open(self.path)
-            .unwrap())
+    fn read_lines(&self)->ioResult<Vec<String>> {
+        let f = File::open(self.path)?;
+        BufReader::new(f)
             .lines()
-            .collect::<Result<Vec<_>, _>>()
-            .unwrap()
+            .collect()
     }
 
     fn write<P: AsRef<Path>+?Sized>(save_path: &P, lines: &Vec<String>)->ioResult<()> {
@@ -227,7 +226,7 @@ mod test {
     #[test]
     fn test_read() {
         let fext = FileExtractor::new("./data/ch02/hightemp.txt");
-        let buf = fext.read();
+        let buf = fext.read().unwrap();
 
         assert_eq!(
             buf.lines().take(1).collect::<String>(),
@@ -242,7 +241,7 @@ mod test {
         let res = fxt.read_lines();
 
         assert_eq!(
-            res.iter().next().unwrap(),
+            res.unwrap().iter().next().unwrap(),
             "高知県\t江川崎\t41\t2013-08-12"
         )
     }
