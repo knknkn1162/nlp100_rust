@@ -1,9 +1,8 @@
 use std::io::{BufReader, BufRead, Read, BufWriter, Write};
 use std::fs::File;
-use std::io;
+use std::io::{self, Result as ioResult};
 use std::path::Path;
 use std::collections::HashMap;
-
 use ch02::util;
 
 struct FileExtractor<'a> {path: &'a Path}
@@ -28,6 +27,13 @@ impl<'a> FileExtractor<'a> {
             .lines()
             .collect::<Result<Vec<_>, _>>()
             .unwrap()
+    }
+
+    fn write<P: AsRef<Path>+?Sized>(save_path: &P, lines: &Vec<String>)->ioResult<()> {
+        let mut buffer = BufWriter::new(
+            File::create(save_path).unwrap()
+        );
+        buffer.write_all(lines.join("\n").as_bytes())
     }
 
     /// ch02.10 count lines
@@ -65,7 +71,7 @@ impl<'a> FileExtractor<'a> {
             })
             .collect::<Vec<_>>();
     }
-
+/*
     /// helper for ch03.13; merge col1.txt and col2.txt
     fn merge(row1: &str, row2: &str)-> String {
         row1.lines()
