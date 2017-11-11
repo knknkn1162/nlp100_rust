@@ -9,7 +9,7 @@ use ch02::util;
 struct FileExtractor<'a> {path: &'a Path}
 
 impl<'a> FileExtractor<'a> {
-    pub fn new<P: AsRef<Path>+ ?Sized>(path: &'a P)-> FileExtractor<'a> {
+    pub fn new<P: AsRef<Path>+ ?Sized>(path: &P)-> FileExtractor {
         FileExtractor {path: path.as_ref()}
     }
 
@@ -29,21 +29,17 @@ impl<'a> FileExtractor<'a> {
             .collect::<Result<Vec<_>, _>>()
             .unwrap()
     }
-/*
-    /// ch01.10 count lines
+
+    /// ch02.10 count lines
     pub fn count_lines(&self)->usize {
-        let mut buf = String::new();
-        let _ = self.read(&mut buf).unwrap();
-        buf.lines().collect::<Vec<_>>().len()
+        self.read_lines().len()
     }
 
-    /// ch01.11 replace a tab-character to a space
+    /// ch02.11 replace a tab-character to a space
     pub fn replace_tab_to_space(&self)->String {
-        let mut buf = String::new();
-        let _ = self.read(&mut buf).unwrap();
-        buf.replace("\t", " ")
+        self.read().replace("\t", " ")
     }
-
+/*
     /// helper for ch02.12
     fn extract_row(&self, n: usize)->Vec<String> {
         let mut buf = String::new();
