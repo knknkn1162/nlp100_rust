@@ -22,8 +22,12 @@ impl<'a> FileExtractor<'a> {
     }
 
     /// return iterator instead of String in read method.
-    fn read_lines(&self)->io::Lines<BufReader<File>> {
-        BufReader::new(File::open(self.path).unwrap()).lines()
+    fn read_lines(&self)->Vec<String> {
+        BufReader::new(File::open(self.path)
+            .unwrap())
+            .lines()
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap()
     }
 /*
     /// ch01.10 count lines
@@ -236,7 +240,7 @@ mod test {
         let mut res = fxt.read_lines();
 
         assert_eq!(
-            res.next().unwrap().unwrap(),
+            res.iter().next().unwrap(),
             "高知県\t江川崎\t41\t2013-08-12"
         )
     }
