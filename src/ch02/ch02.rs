@@ -35,25 +35,12 @@ impl<'a> FileExtractor<'a> {
 
     /// helper for read designated file. ignore error
     fn read(&self)->ioResult<String> {
-        let mut reader = BufReader::new(File::open(self.path).unwrap());
-        let mut buf = String::new();
-        let _ = reader.read_to_string(&mut buf)?;
-        Ok(buf)
+        self::read(self.path)
     }
 
     /// return iterator instead of String in read method.
     fn read_lines(&self)->ioResult<Vec<String>> {
-        let f = File::open(self.path)?;
-        BufReader::new(f)
-            .lines()
-            .collect()
-    }
-
-    fn write<P: AsRef<Path>+?Sized>(save_path: &P, lines: &Vec<String>)->ioResult<()> {
-        let mut buffer = BufWriter::new(
-            File::create(save_path).unwrap()
-        );
-        buffer.write_all(lines.join("\n").as_bytes())
+        self::read_lines(self.path)
     }
 
     /// ch02.10 count lines
@@ -68,13 +55,13 @@ impl<'a> FileExtractor<'a> {
 
     /// helper for ch02.12
     fn extract_row(&self, n: usize)->Vec<String> {
-        let mut buf = String::new();
-        let buf = self.read().unwrap();
-        buf.lines()
+        let bufs = self.read_lines().unwrap();
+        bufs.iter()
             .map(|line| {
                 line.split('\t')
                     .nth(n)
-                    .unwrap().to_string()
+                    .unwrap()
+                    .to_string()
             })
             .collect()
     }
@@ -86,40 +73,47 @@ impl<'a> FileExtractor<'a> {
             .enumerate()
             .map(|(idx, file)| {
                 let v = self.extract_row(idx);
-                FileExtractor::write(file, &v).unwrap()
+                self::write(file, &v).unwrap()
             })
             .collect::<Vec<_>>();
     }
-/*
+
     /// helper for ch03.13; merge col1.txt and col2.txt
-    fn merge(row1: &str, row2: &str)-> String {
-        row1.lines()
-            .zip(row2.lines())
+    fn merge(row1: &Vec<String>, row2: &Vec<String>)-> String {
+        row1.iter()
+            .zip(row2.iter())
             .map(|(item1, item2)| format!("{}{}{}", item1, '\t', item2))
             .collect::<Vec<_>>().join("\n")
     }
 
     /// ch03.13; save result of merge method.
     pub fn save_merge<T: AsRef<Path>>(file1: &T, file2: &T, save_file: &T) {
-        let mut reader = BufReader::new(File::open(file1).unwrap());
-        let mut line1 = String::new();
-        let _ = reader.read_to_string(&mut line1).unwrap();
+        let lines = vec![file1, file2].into_iter()
+            .map(|file|
+                self::read_lines(file)
+                    .unwrap()
+            )
+            .collect::<Vec<_>>();
 
-        let mut reader = BufReader::new(File::open(file2).unwrap());
-        let mut line2 = String::new();
-        let _ = reader.read_to_string(&mut line2).unwrap();
+        let res = FileExtractor::merge(&lines[0], &lines[1]);
 
-        let res = FileExtractor::merge(&line1, &line2);
-
-        let mut writer = BufWriter::new(File::create(save_file).unwrap());
-        let _ = writer.write_all(res.as_bytes()).unwrap();
+        BufWriter::new(
+            File::create(save_file)
+                .unwrap()
+        )
+            .write_all(res.as_bytes())
+            .unwrap();
     }
 
     /// ch02.14 take first ${num} lines
     pub fn head(&self, n: usize)->String {
-        let s = self.read().unwrap();
-        s.lines().take(n).collect::<Vec<_>>().join("\n")
-    }
+        self.read_lines()
+            .unwrap()
+            .into_iter()
+            .take(n)
+            .collect::<Vec<_>>()
+            .join("\n")
+    }/*
 
     /// ch02.15 tail last ${num} lines
     pub fn tail(&self, n: usize)->String {
