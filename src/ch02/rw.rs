@@ -24,7 +24,7 @@ pub fn write<P: AsRef<Path>, Q: AsRef<[u8]>>(s: Q, save_path: P)->ioResult<()> {
         .write_all(s.as_ref())
 }
 
-pub fn write_lines<P: AsRef<Path>>(save_path: P, lines: &Vec<&str>)->ioResult<()> {
+pub fn write_lines<P: AsRef<Path>>(lines: &Vec<&str>, save_path: P)->ioResult<()> {
     write(lines.join("\n"), save_path)
 }
 
