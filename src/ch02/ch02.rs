@@ -281,16 +281,16 @@ mod test {
             commander.replace_tab_to_space()
         )
     }
-/*
+
     #[test]
     fn test_ch02_12_helper_extract_row() {
         let load_path = Path::new("./data/ch02/hightemp.txt");
-        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        let fxt = FileExtractor::new(load_path);
 
         let commander = Commander::new(load_path);
 
         assert_eq!(
-            commander.extract_row(0).lines().collect::<Vec<&str>>(),
+            commander.extract_row(0).lines().collect::<Vec<_>>(),
             fxt.extract_row(0)
         );
     }
@@ -306,9 +306,10 @@ mod test {
         // assume that file doesn't exist
         let _ = vec![&file1, &file2]
             .into_iter()
-            .map(|fpath| ::std::fs::remove_file(fpath)).collect::<Vec<_>>();
+            .map(|fpath| ::std::fs::remove_file(fpath))
+            .collect::<Vec<_>>();
 
-        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        let fxt = FileExtractor::new(load_path);
         fxt.save_first_second_row(&file1, &file2);
 
         assert!(file1.exists());
@@ -327,10 +328,10 @@ mod test {
     #[test]
     fn test_merge() {
         let load_path = Path::new("./data/ch02/hightemp.txt");
-        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        let fxt = FileExtractor::new(load_path);
 
-        let lines1 = fxt.extract_row(0).join("\n");
-        let lines2 = fxt.extract_row(1).join("\n");
+        let lines1 = fxt.extract_row(0);
+        let lines2 = fxt.extract_row(1);
 
         let commander = Commander::new(load_path);
         let parent = load_path.parent().unwrap();
@@ -350,9 +351,9 @@ mod test {
 
         let file1 = parent.join("col1.txt");
         let file2 = parent.join("col2.txt");
-        let save_file = parent.join("col12.txt");
+        let save_file = parent.join("col_12.txt");
 
-        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        let fxt = FileExtractor::new(load_path);
         fxt.save_first_second_row(&file1, &file2);
 
         // assume that save_file doesn't exist.
@@ -364,9 +365,8 @@ mod test {
 
     #[test]
     fn test_head() {
-        let load_path = Path::new("./data/ch02/hightemp.txt");
-
-        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        let load_path = "./data/ch02/hightemp.txt";
+        let fxt = FileExtractor::new(load_path);
         let n = 5;
 
         let commander = Commander::new(load_path);
@@ -375,7 +375,7 @@ mod test {
             commander.head(n)
         )
     }
-
+/*
     #[test]
     fn test_tail() {
         let load_path = Path::new("./data/ch02/hightemp.txt");
