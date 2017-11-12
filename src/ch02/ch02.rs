@@ -113,7 +113,7 @@ impl<'a> FileExtractor<'a> {
             .take(n)
             .collect::<Vec<_>>()
             .join("\n")
-    }/*
+    }
 
     /// ch02.15 tail last ${num} lines
     pub fn tail(&self, n: usize)->String {
@@ -127,13 +127,16 @@ impl<'a> FileExtractor<'a> {
     /// helper for ch02.16 return String
     fn split(&self, n: usize)->Vec<String> {
         let size = self.count_lines();
-        let splitn = ::ch02::util::get_split_line_count(size, n);
-        let ss = self.read_lines();
-        ss.chunks(splitn)
-            .map(|ws| ws.join("\n")
-            ).collect()
+        let split_n = ::ch02::util::get_split_line_count(size, n);
+        self.read_lines()
+            .unwrap()
+            .chunks(split_n)
+            .map(|ws|
+                ws.join("\n")
+            )
+            .collect()
     }
-
+/*
     /// ch02.16 split ${n} files
     /// return is success count of saving files.
     pub fn save_split<P: AsRef<Path>>(&self, n: usize, dst: &P)->usize {
@@ -375,12 +378,11 @@ mod test {
             commander.head(n)
         )
     }
-/*
+
     #[test]
     fn test_tail() {
-        let load_path = Path::new("./data/ch02/hightemp.txt");
-
-        let fxt = FileExtractor {path: load_path.to_str().unwrap()};
+        let load_path = "./data/ch02/hightemp.txt";
+        let fxt = FileExtractor::new(load_path);
         let n = 5;
 
         let commander = Commander::new(load_path);
@@ -389,7 +391,7 @@ mod test {
             commander.tail(n)
         )
     }
-
+/*
     #[test]
     fn test_split() {
         let load_path = Path::new("./data/ch02/hightemp.txt");
