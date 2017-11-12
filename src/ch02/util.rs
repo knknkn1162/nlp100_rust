@@ -4,15 +4,6 @@ pub fn get_split_line_count(size: usize, split_num: usize)->usize {
     if size%split_num==0 {res} else {res+1}
 }
 
-/// more efficient trim than String::trim that signature is Fn(String)->&str
-pub fn trim_mut(s: &mut String, ch: char) {
-    let mut len = s.len();
-    while s.ends_with(ch) {
-        len -= 1;
-        s.truncate(len);
-    }
-}
-
 
 #[cfg(test)]
 mod tests {
