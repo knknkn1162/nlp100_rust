@@ -7,6 +7,27 @@ use ch02::util;
 
 struct FileExtractor<'a> {path: &'a Path}
 
+fn read<P: AsRef<Path>+?Sized>(load_path: &P)-> ioResult<String> {
+    let mut reader = BufReader::new(File::open(load_path).unwrap());
+    let mut buf = String::new();
+    let _ = reader.read_to_string(&mut buf)?;
+    Ok(buf)
+}
+
+fn read_lines<P: AsRef<Path>+?Sized>(load_path: &P)->ioResult<Vec<String>> {
+    let f = File::open(load_path)?;
+    BufReader::new(f)
+        .lines()
+        .collect()
+}
+
+fn write<P: AsRef<Path>+?Sized>(save_path: &P, lines: &Vec<String>)->ioResult<()> {
+    let mut buffer = BufWriter::new(
+        File::create(save_path).unwrap()
+    );
+    buffer.write_all(lines.join("\n").as_bytes())
+}
+
 impl<'a> FileExtractor<'a> {
     pub fn new<P: AsRef<Path>+ ?Sized>(path: &P)-> FileExtractor {
         FileExtractor {path: path.as_ref()}
