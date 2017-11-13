@@ -3,60 +3,46 @@ use std::fs::File;
 use std::io::{self, Result as ioResult};
 use std::path::Path;
 use std::collections::HashMap;
-use ch02::util;
+
+use super::{rw, util};
 
 struct FileExtractor<'a> {path: &'a Path}
 
-fn read<P: AsRef<Path>+?Sized>(load_path: &P)-> ioResult<String> {
-    let mut reader = BufReader::new(File::open(load_path).unwrap());
-    let mut buf = String::new();
-    let _ = reader.read_to_string(&mut buf)?;
-    Ok(buf)
-}
-
-fn read_lines<P: AsRef<Path>+?Sized>(load_path: &P)->ioResult<Vec<String>> {
-    let f = File::open(load_path)?;
-    BufReader::new(f)
-        .lines()
-        .collect()
-}
-
-fn write<P: AsRef<Path>+?Sized>(save_path: &P, lines: &Vec<String>)->ioResult<()> {
-    let mut buffer = BufWriter::new(
-        File::create(save_path).unwrap()
-    );
-    buffer.write_all(lines.join("\n").as_bytes())
-}
-
 impl<'a> FileExtractor<'a> {
-    pub fn new<P: AsRef<Path>+ ?Sized>(path: &P)-> FileExtractor {
+    pub fn new<P: AsRef<Path>+?Sized>(path: &P)-> FileExtractor {
         FileExtractor {path: path.as_ref()}
     }
 
     /// helper for read designated file. ignore error
     fn read(&self)->ioResult<String> {
-        self::read(self.path)
+        rw::read(self.path)
     }
 
     /// return iterator instead of String in read method.
     fn read_lines(&self)->ioResult<Vec<String>> {
-        self::read_lines(self.path)
+        rw::read_lines(self.path)
     }
 
     /// ch02.10 count lines
     pub fn count_lines(&self)->usize {
-        self.read_lines().unwrap().len()
+        self.read_lines()
+            .unwrap()
+            .len()
     }
 
     /// ch02.11 replace a tab-character to a space
     pub fn replace_tab_to_space(&self)->String {
-        self.read().unwrap().replace("\t", " ")
+        self.read()
+            .unwrap()
+            .replace("\t", " ")
     }
 
     /// helper for ch02.12
+    /// n: col index beginning with 0.
     fn extract_row(&self, n: usize)->Vec<String> {
-        let bufs = self.read_lines().unwrap();
-        bufs.iter()
+        self.read_lines()
+            .unwrap()
+            .into_iter()
             .map(|line| {
                 line.split('\t')
                     .nth(n)
@@ -73,36 +59,36 @@ impl<'a> FileExtractor<'a> {
             .enumerate()
             .map(|(idx, file)| {
                 let v = self.extract_row(idx);
-                self::write(file, &v).unwrap()
+                let _ = rw::write_lines(&v, file)
+                    .unwrap();
             })
             .collect::<Vec<_>>();
     }
 
     /// helper for ch03.13; merge col1.txt and col2.txt
-    fn merge(row1: &Vec<String>, row2: &Vec<String>)-> String {
+    fn merge<S: AsRef<str>>(row1: &Vec<S>, row2: &Vec<S>)-> String {
         row1.iter()
             .zip(row2.iter())
-            .map(|(item1, item2)| format!("{}{}{}", item1, '\t', item2))
-            .collect::<Vec<_>>().join("\n")
+            .map(|(item1, item2)|
+                format!("{}{}{}", item1.as_ref(), '\t', item2.as_ref())
+            )
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 
     /// ch03.13; save result of merge method.
-    pub fn save_merge<T: AsRef<Path>>(file1: &T, file2: &T, save_file: &T) {
-        let lines = vec![file1, file2].into_iter()
+    pub fn save_merge<T1: AsRef<Path>, T2: AsRef<Path>>(file1: T1, file2: T1, save_file: T2) {
+        let lines = vec![file1, file2]
+            .into_iter()
             .map(|file|
-                self::read_lines(file)
+                rw::read_lines(file)
                     .unwrap()
             )
             .collect::<Vec<_>>();
 
         let res = FileExtractor::merge(&lines[0], &lines[1]);
 
-        BufWriter::new(
-            File::create(save_file)
-                .unwrap()
-        )
-            .write_all(res.as_bytes())
-            .unwrap();
+        rw::write(&res, save_file);
     }
 
     /// ch02.14 take first ${num} lines
@@ -117,17 +103,22 @@ impl<'a> FileExtractor<'a> {
 
     /// ch02.15 tail last ${num} lines
     pub fn tail(&self, n: usize)->String {
-        let s = self.read().unwrap();
-
-        let mut r = s.lines().rev().take(n).collect::<Vec<_>>();
-        r.reverse();
-        r.join("\n")
+        let mut v = self.read_lines()
+            .unwrap()
+            .into_iter()
+            .rev()
+            .take(n)
+            .collect::<Vec<_>>();
+        v.reverse();
+        v.join("\n")
     }
-
+/*
     /// helper for ch02.16 return String
     fn split(&self, n: usize)->Vec<String> {
-        let size = self.count_lines();
-        let split_n = ::ch02::util::get_split_line_count(size, n);
+        let split_n = ::ch02::util::get_split_line_count(
+            self.count_lines(),
+            n
+        );
         self.read_lines()
             .unwrap()
             .chunks(split_n)
@@ -136,35 +127,40 @@ impl<'a> FileExtractor<'a> {
             )
             .collect()
     }
-/*
+
     /// ch02.16 split ${n} files
     /// return is success count of saving files.
-    pub fn save_split<P: AsRef<Path>>(&self, n: usize, dst: &P)->usize {
+    pub fn save_split<P: AsRef<Path>>(&self, n: usize, dst: P)->usize {
         let vs = self.split(n);
         let save_path = dst.as_ref();
         assert!(n <= 24); // assume that limit is the number of alphabet.
         let filenames =
-            (b'a'..b'z').map(|s|
-                format!(
+            (b'a'..b'z').map(|s| {
+                let new_filename = format!(
                     "{}{}",
-                    save_path.file_name().unwrap().to_str().unwrap(),
+                    save_path.file_name()
+                        .unwrap()
+                        .to_str()
+                        .unwrap(),
                     format!("{}{}", 'a', s as char)
-                )
-            )
-                .take(n).collect::<Vec<String>>();
+                );
+                save_path.parent()
+                    .unwrap()
+                    .join(&new_filename)
+            })
+                .take(n)
+                .collect::<Vec<String>>();
 
 
         // write files
         vs.iter()
             .zip(filenames.iter())
-            .map(|(s, file)| {
-                let newfile = save_path.parent().unwrap().join(&file);
-                let mut writer = BufWriter::new(File::create(newfile).unwrap());
-                writer.write(s.as_bytes())
-            })
-            .collect::<Result<Vec<_>,_>>().unwrap().len()
-
-
+            .map(|(s, file)|
+                     self::write(file, s)
+            )
+            .collect::<Result<Vec<_>,_>>()
+            .unwrap()
+            .len()
     }
 
     /// ch02.17 collect unique items in first row.
@@ -230,8 +226,8 @@ impl<'a> FileExtractor<'a> {
             .map(|s| s.join(delimiter)).collect()
 
     }
-
 */
+
 }
 
 #[cfg(test)]
@@ -498,5 +494,5 @@ mod test {
                  "山梨県\t大月\t39.9\t1990-07-19"]
         )
     }
-    */
+*/
 }
