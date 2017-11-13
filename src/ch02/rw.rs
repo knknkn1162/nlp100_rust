@@ -24,7 +24,8 @@ pub fn write<P: AsRef<Path>, Q: AsRef<[u8]>>(s: Q, save_path: P)->ioResult<()> {
         .write_all(s.as_ref())
 }
 
-pub fn write_lines<P: AsRef<Path>>(lines: &Vec<&str>, save_path: P)->ioResult<()> {
+/// use Borrow trait instead of AsRef because of join method, https://doc.rust-lang.org/std/primitive.slice.html#method.join
+pub fn write_lines<P: AsRef<Path>, S: ::std::borrow::Borrow<str>>(lines: &Vec<S>, save_path: P)->ioResult<()> {
     write(lines.join("\n"), save_path)
 }
 
@@ -92,12 +93,12 @@ mod tests {
         let buf = "abc\nあああ\nbcd\n".lines().collect::<Vec<_>>();
 
         assert_eq!(
-            self::write_lines(save_path, &buf).unwrap(), ()
+            self::write_lines(&buf, save_path).unwrap(), ()
         );
         let s = "abc\nあああ\nbcd\n".to_string();
         let buf = s.lines().collect::<Vec<_>>();
         assert_eq!(
-            self::write_lines(save_path, &buf).unwrap(), ()
+            self::write_lines(&buf, save_path).unwrap(), ()
         );
     }
 }
