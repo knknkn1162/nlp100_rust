@@ -30,6 +30,24 @@ impl<'a> CSVExtractor<'a> {
             .records()
             .count()
     }
+
+    /// ch02.11 replace a tab-character to a space
+    pub fn replace_tab_to_space(&self)->String {
+        csv::ReaderBuilder::new()
+            .delimiter(b'\t') // The default is b','.
+            .has_headers(false) // By default, the first row is treated as a special header row,
+            .from_reader(File::open(self.path).unwrap())
+            .into_records()
+            .map(|s|
+                s.unwrap()
+                    .iter()
+                    .collect::<Vec<&str>>()
+                    .join(" ") // space
+            )
+            .collect::<Vec<_>>()
+            .join("\n")
+
+    }
 }
 
 #[cfg(test)]
@@ -50,5 +68,18 @@ mod tests {
             csvor.count_lines(),
             Commander::new(path).count_lines().unwrap()
         );
+    }
+
+    #[test]
+    fn test_replace_tab_to_space() {
+        let path = "./data/ch02/hightemp.txt";
+        let csvor = CSVExtractor::new(path);
+
+        let commander = Commander::new(path);
+
+        assert_eq!(
+            csvor.replace_tab_to_space(),
+            commander.replace_tab_to_space().trim()
+        )
     }
 }
