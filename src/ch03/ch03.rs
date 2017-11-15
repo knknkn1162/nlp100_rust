@@ -5,7 +5,7 @@ use std::fs::File;
 use std::process::{Command, Stdio};
 
 
-fn download<T: reqwest::IntoUrl, P: AsRef<Path>>(url: T, save_dir: P)->ioResult<()> {
+fn get_json<T: reqwest::IntoUrl, P: AsRef<Path>>(url: T, save_dir: P)->ioResult<()> {
     let mut response = reqwest::get(url).unwrap();
     let fname = {
         let fname = response.url()
@@ -37,10 +37,17 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_download() {
-        let _ = download(
+    fn test_get_json() {
+        let dir = "./data/ch03";
+
+        // assume json file not exist
+        let _ = ::std::fs::remove_dir_all(dir);
+
+        let _ = get_json(
             "http://www.cl.ecei.tohoku.ac.jp/nlp100/data/jawiki-country.json.gz",
-        "./data/ch03",
-        );
+        dir,
+        ).unwrap();
+
+        assert!(Path::new("./data/ch03/jawiki-country.json").exists());
     }
 }
