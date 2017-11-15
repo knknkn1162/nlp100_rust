@@ -8,6 +8,7 @@ use std::fs::File;
 use self::chrono::NaiveDate;
 use std::io::{Read};
 use super::rw;
+use std::fmt::Display;
 
 #[derive(Debug,Deserialize)]
 struct Record {
@@ -85,7 +86,24 @@ impl<'a> CSVExtractor<'a> {
         rw::write(regions, region_file);
     }
 
+    /// ch03.13; merge col1.txt and col2.txt and save on file
+    pub fn save_merge<P1: AsRef<Path>, P2: AsRef<Path>>(file1: P1, file2: P1, save_path: P2) {
+        let (row1, row2) = (rw::read_lines(file1).unwrap(), rw::read_lines(file2).unwrap());
+        rw::write(
+            merge(&row1, &row2, '\t'),
+            save_path
+        );
+    }
+}
 
+/// helper for ch03.13; merge col1.txt and col2.txt
+fn merge<S1: Display, S2: Display>(row1: &[S1], row2: &[S2], delimiter: char)->String {
+    row1.into_iter()
+        .zip(row2.into_iter())
+        .map(|(s1, s2)|
+            format!("{}{}{}", s1, delimiter, s2))
+        .collect::<Vec<String>>()
+        .join("\n")
 }
 
 #[cfg(test)]
