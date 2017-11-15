@@ -16,9 +16,10 @@ fn download<T: reqwest::IntoUrl, P: AsRef<Path>>(url: T, save_dir: P)->ioResult<
         save_dir.as_ref().join(fname)
     };
 
-    let _ = ::std::fs::create_dir(save_dir); // ignore save_dir exists
+    // NOT use unwrap method to ignore whether save_dir exists or not
+    let _ = ::std::fs::create_dir(save_dir);
     let mut f = File::create(&fname)?;
-    copy(&mut response, &mut f);
+    let _ = copy(&mut response, &mut f);
 
     let output = Command::new("gunzip")
         .arg(fname)
@@ -26,7 +27,7 @@ fn download<T: reqwest::IntoUrl, P: AsRef<Path>>(url: T, save_dir: P)->ioResult<
 
     eprintln!("status: {:?}", output.status);
     eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-    eprintln!("stderr: \n{}", String::from_utf8_lossy(&output.stderr));
+    eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
     Ok(())
 
 }
