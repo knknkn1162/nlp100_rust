@@ -10,7 +10,7 @@ use std::io::{Read};
 use super::rw;
 use std::fmt::Display;
 
-#[derive(Debug,Deserialize)]
+#[derive(Debug,Deserialize, Serialize)]
 struct Record {
     pref: String,
     region: String,
@@ -117,6 +117,22 @@ fn merge<S1: ToString, S2: ToString>(row1: &[S1], row2: &[S2], delimiter: char)-
             format!("{}{}{}", s1.to_string(), delimiter, s2.to_string()))
         .collect::<Vec<String>>()
         .join("\n")
+}
+
+/// serialize
+fn serialize(records: &[Record], delimiter: char)->String {
+    let mut wtr = csv::WriterBuilder::new()
+        .delimiter(delimiter as u8)
+        .has_headers(false)
+        .from_writer(vec![]);
+
+    records.into_iter()
+        .for_each(|record| {
+            let _ = wtr.serialize(record);
+        });
+    String::from_utf8(wtr.into_inner().unwrap())
+        .unwrap()
+
 }
 
 #[cfg(test)]
