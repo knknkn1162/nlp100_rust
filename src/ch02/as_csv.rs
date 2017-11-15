@@ -172,13 +172,44 @@ mod tests {
         // assume that file doesn't exist
         vec![&file1, &file2]
             .into_iter()
-            .for_each(|fpath| {::std::fs::remove_file(fpath);});
+            .for_each(|fpath| {let _ = ::std::fs::remove_file(fpath);});
 
         csvor.save_first_second_row(&file1, &file2);
 
         // assert files exist
         assert!(file1.exists());
         assert!(file2.exists());
+    }
+
+    #[test]
+    fn test_merge() {
+        let row1 = vec!["aa", "bb", "cc"];
+        let row2 = [11, 12, 13];
+        let res = merge(&row1, &row2[..], '\t');
+
+        assert_eq!(
+            res,
+            "aa\t11\nbb\t12\ncc\t13"
+        )
+    }
+
+    #[test]
+    fn test_save_merge() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let parent = load_path.parent().unwrap();
+
+        let file1 = parent.join("col1.txt");
+        let file2 = parent.join("col2.txt");
+        let save_path = parent.join("col_12.txt");
+
+
+        // assume that save_path doesn't exist.
+        let _ = ::std::fs::remove_file(&save_path).unwrap();
+
+        CSVExtractor::save_merge(file1, file2, &save_path);
+
+        assert!(save_path.exists());
+
     }
 
 }
