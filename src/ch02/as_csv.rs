@@ -97,11 +97,11 @@ impl<'a> CSVExtractor<'a> {
 }
 
 /// helper for ch03.13; merge col1.txt and col2.txt
-fn merge<S1: Display, S2: Display>(row1: &[S1], row2: &[S2], delimiter: char)->String {
+fn merge<S1: ToString, S2: ToString>(row1: &[S1], row2: &[S2], delimiter: char)->String {
     row1.into_iter()
         .zip(row2.into_iter())
         .map(|(s1, s2)|
-            format!("{}{}{}", s1, delimiter, s2))
+            format!("{}{}{}", s1.to_string(), delimiter, s2.to_string()))
         .collect::<Vec<String>>()
         .join("\n")
 }
