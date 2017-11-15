@@ -22,11 +22,11 @@ pub struct CSVExtractor<'a> {path: &'a Path}
 
 
 impl<'a> CSVExtractor<'a> {
-    pub fn new<P: AsRef<Path>+?Sized>(path: &P)->CSVExtractor {
-        CSVExtractor {path: path.as_ref()}
+    pub fn new<P: AsRef<Path> + ? Sized>(path: &P) -> CSVExtractor {
+        CSVExtractor { path: path.as_ref() }
     }
 
-    fn deserialize(&self)->Vec<Record> {
+    fn deserialize(&self) -> Vec<Record> {
         csv::ReaderBuilder::new()
             .delimiter(b'\t')
             .has_headers(false) // By default, the first row is treated as a special header row,
@@ -37,31 +37,31 @@ impl<'a> CSVExtractor<'a> {
     }
 
     /// ch02.10 count lines
-    pub fn count_lines(&self)->usize {
+    pub fn count_lines(&self) -> usize {
         csv::Reader::from_reader(File::open(self.path).unwrap())
             .records()
             .count()
     }
 
     /// ch02.11 replace a tab-character to a space
-    pub fn replace_tab_to_space(&self)->String {
+    pub fn replace_tab_to_space(&self) -> String {
         csv::ReaderBuilder::new()
             .delimiter(b'\t') // The default is b','.
             .has_headers(false) // By default, the first row is treated as a special header row,
             .from_reader(File::open(self.path).unwrap())
             .into_records()
             .map(|s|
-                s.unwrap()
-                    .iter()
-                    .collect::<Vec<&str>>()
-                    .join(" ") // space
+                     s.unwrap()
+                         .iter()
+                         .collect::<Vec<&str>>()
+                         .join(" ") // space
             )
             .collect::<Vec<_>>()
             .join("\n")
     }
 
     /// helper for ch02.12; extract first & second row and return (String, String)
-    fn extract_first_second_row(&self)->(String, String) {
+    fn extract_first_second_row(&self) -> (String, String) {
         let first_row = self.deserialize()
             .into_iter()
             .map(|s| s.pref)
@@ -93,6 +93,19 @@ impl<'a> CSVExtractor<'a> {
             merge(&row1, &row2, '\t'),
             save_path
         );
+    }
+
+    // ch02.14~16 same as ch02.rs
+
+    /// ch02.17 collect unique items in first row.
+    pub fn uniq_first_row(&self)->String {
+        let mut prefs = self.deserialize()
+            .into_iter()
+            .map(|s| s.pref)
+            .collect::<Vec<_>>();
+        prefs.sort_unstable();
+        prefs.dedup();
+        prefs.join("\n")
     }
 }
 
@@ -209,7 +222,19 @@ mod tests {
         CSVExtractor::save_merge(file1, file2, &save_path);
 
         assert!(save_path.exists());
+    }
 
+    #[test]
+    fn test_uniq_first_row() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let csvor = CSVExtractor::new(&load_path);
+
+        let commander = Commander::new(&load_path);
+
+        assert_eq!(
+            csvor.uniq_first_row(),
+            commander.uniq_first_row()
+        );
     }
 
 }
