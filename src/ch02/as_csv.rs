@@ -107,6 +107,16 @@ impl<'a> CSVExtractor<'a> {
         prefs.dedup();
         prefs.join("\n")
     }
+
+    /// ch02.18 sort by third columns in descending
+    pub fn sort_temp_in_descending(&self)->String {
+        let mut records = self.deserialize();
+        records.sort_by(|s1, s2|
+            s2.temp.partial_cmp(&(s1.temp)).unwrap()
+        );
+
+        self::serialize(&records, '\t')
+    }
 }
 
 /// helper for ch03.13; merge col1.txt and col2.txt
@@ -251,6 +261,19 @@ mod tests {
             csvor.uniq_first_row(),
             commander.uniq_first_row()
         );
+    }
+
+    #[test]
+    fn test_sort_temp_in_descending() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let csvor = CSVExtractor::new(&load_path);
+
+        let res = csvor.sort_temp_in_descending();
+
+        assert_eq!(
+            res.lines().take(3).collect::<Vec<&str>>(),
+            vec!["高知県\t江川崎\t41\t2013-08-12", "埼玉県\t熊谷\t40.9\t2007-08-16", "岐阜県\t多治見\t40.9\t2007-08-16"]
+        )
     }
 
 }
