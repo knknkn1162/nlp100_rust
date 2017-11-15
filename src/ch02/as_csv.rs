@@ -119,7 +119,7 @@ impl<'a> CSVExtractor<'a> {
         self::serialize(&records, '\t')
     }
 
-    /// ch02.19 sort by the number of prefectures in descenging.
+    /// ch02.19 sort by the number of prefectures in descending.
     pub fn sort_by_frequent_item(&self)->String {
         let mut hashmap = HashMap::new();
         self.deserialize()
@@ -300,6 +300,16 @@ mod tests {
             res.lines().take(3).collect::<Vec<&str>>(),
             vec!["高知県\t江川崎\t41\t2013-08-12", "埼玉県\t熊谷\t40.9\t2007-08-16", "岐阜県\t多治見\t40.9\t2007-08-16"]
         )
+    }
+
+    #[test]
+    fn test_sort_by_frequent_item() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let csvor = CSVExtractor::new(&load_path);
+
+        let res = csvor.sort_by_frequent_item();
+
+        eprintln!("{:?}", res.lines().collect::<Vec<_>>());
     }
 
 }
