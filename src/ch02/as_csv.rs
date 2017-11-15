@@ -7,6 +7,7 @@ use std::path::Path;
 use std::fs::File;
 use self::chrono::NaiveDate;
 use std::io::{Read};
+use super::rw;
 
 #[derive(Debug,Deserialize)]
 struct Record {
@@ -22,6 +23,16 @@ pub struct CSVExtractor<'a> {path: &'a Path}
 impl<'a> CSVExtractor<'a> {
     pub fn new<P: AsRef<Path>+?Sized>(path: &P)->CSVExtractor {
         CSVExtractor {path: path.as_ref()}
+    }
+
+    fn deserialize(&self)->Vec<Record> {
+        csv::ReaderBuilder::new()
+            .delimiter(b'\t')
+            .has_headers(false) // By default, the first row is treated as a special header row,
+            .from_reader(File::open(self.path).unwrap())
+            .deserialize::<Record>()
+            .flat_map(|s| s)
+            .collect()
     }
 
     /// ch02.10 count lines
