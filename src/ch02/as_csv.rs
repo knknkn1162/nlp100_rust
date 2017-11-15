@@ -57,8 +57,29 @@ impl<'a> CSVExtractor<'a> {
             )
             .collect::<Vec<_>>()
             .join("\n")
-
     }
+
+    /// helper for ch02.12
+    /// n: col index beginning with 0.
+    pub fn save_first_second_row<P: AsRef<Path>>(&self, file1: P, file2: P) {
+        let first_row = self.deserialize()
+            .into_iter()
+            .map(|s| s.pref)
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        rw::write(first_row, file1.as_ref());
+
+        let second_row = self.deserialize()
+            .into_iter()
+            .map(|s| s.region)
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        rw::write(second_row, file2.as_ref());
+    }
+
+
 }
 
 #[cfg(test)]
@@ -92,5 +113,34 @@ mod tests {
             csvor.replace_tab_to_space(),
             commander.replace_tab_to_space().trim()
         )
+    }
+
+    #[test]
+    fn test_save_first_second_row() {
+        let load_path = Path::new("./data/ch02/hightemp.txt");
+        let parent = load_path.parent().unwrap();
+
+        let file1 = parent.join("col1.txt");
+        let file2 = parent.join("col2.txt");
+
+        // assume that file doesn't exist
+        let _ = vec![&file1, &file2]
+            .into_iter()
+            .map(|fpath| ::std::fs::remove_file(fpath))
+            .collect::<Vec<_>>();
+
+        let csvor = CSVExtractor::new(load_path);
+
+        csvor.save_first_second_row(&file1, &file2);
+
+        assert!(file1.exists());
+        assert!(file2.exists());
+
+        let commander = Commander::new(load_path);
+
+        assert_eq!(commander.extract_row(1),
+                   rw::read(&file2)
+                       .unwrap()
+        );
     }
 }
