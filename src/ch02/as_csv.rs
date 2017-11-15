@@ -9,6 +9,7 @@ use self::chrono::NaiveDate;
 use std::io::{Read};
 use super::rw;
 use std::fmt::Display;
+use std::collections::HashMap;
 
 #[derive(Debug,Deserialize, Serialize)]
 struct Record {
@@ -114,6 +115,31 @@ impl<'a> CSVExtractor<'a> {
         records.sort_by(|s1, s2|
             s2.temp.partial_cmp(&(s1.temp)).unwrap()
         );
+
+        self::serialize(&records, '\t')
+    }
+
+    /// ch02.19 sort by the number of prefectures in descenging.
+    pub fn sort_by_frequent_item(&self)->String {
+        let mut hashmap = HashMap::new();
+        self.deserialize()
+            .into_iter()
+            .for_each(|key| {
+                *hashmap.entry(key.pref).or_insert(0) += 1;
+            });
+        let mut ordering = hashmap
+            .into_iter().collect::<Vec<(String, i32)>>();
+        ordering.sort_by_key(|&(_, count)| -count);
+
+        let precedence = ordering
+            .into_iter()
+            .enumerate()
+            .map(|(idx, (elem, _))| (elem, idx))
+            .collect::<HashMap<String, usize>>();
+
+        let mut records = self.deserialize();
+
+        records.sort_by_key(|s| precedence[&s.pref]);
 
         self::serialize(&records, '\t')
     }
