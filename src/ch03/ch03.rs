@@ -22,14 +22,23 @@ fn get_json<T: reqwest::IntoUrl, P: AsRef<Path>>(url: T, save_dir: P)->ioResult<
     let _ = copy(&mut response, &mut f);
 
     let output = Command::new("gunzip")
-        .arg(fname)
+        .arg(&fname)
         .output()?;
 
     eprintln!("status: {:?}", output.status);
     eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
     eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
     Ok(())
+}
 
+struct JsonExtractor<'a> {
+    path: &'a Path,
+}
+
+impl<'a> JsonExtractor<'a> {
+    fn new<P: AsRef<Path>+?Sized>(path: &P)->JsonExtractor {
+        JsonExtractor {path: path.as_ref()}
+    }
 }
 
 #[cfg(test)]
@@ -43,7 +52,7 @@ mod test {
         // assume json file not exist
         let _ = ::std::fs::remove_dir_all(dir);
 
-        let _ = get_json(
+        get_json(
             "http://www.cl.ecei.tohoku.ac.jp/nlp100/data/jawiki-country.json.gz",
         dir,
         ).unwrap();
