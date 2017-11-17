@@ -86,4 +86,23 @@ mod test {
 
         assert!(Path::new("./data/ch03/jawiki-country.json").exists());
     }
+
+    #[test]
+    fn test_search() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.search(key);
+
+        assert_eq!(res.unwrap().title, key);
+    }
+
+    #[test]
+    fn test_extract_text() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.extract_text(key);
+
+        assert_eq!(res.lines().next().unwrap(), "{{redirect|UK}}gi");
+    }
+
 }
