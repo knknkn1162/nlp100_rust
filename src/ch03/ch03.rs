@@ -6,6 +6,7 @@ use std::io::{BufReader, BufRead, copy, Result as ioResult};
 use std::path::Path;
 use std::fs::File;
 use std::process::{Command, Stdio};
+use self::regex::Regex;
 
 
 #[derive(Serialize, Deserialize)]
