@@ -264,4 +264,19 @@ mod test {
         );
     }
 
+    #[test]
+    fn test_extract_template() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.extract_template(key);
+
+        assert_eq!(
+            res["標語"], "{{lang|fr|Dieu et mon droit}}<br/>（[[フランス語]]:神と私の権利）"
+        );
+
+        assert_eq!(res["公式国名"], "{{lang|en|United Kingdom of Great Britain and Northern Ireland}}");
+        assert_eq!(res["GDP値MER"], "2兆4337億");
+    }
+
+
 }
