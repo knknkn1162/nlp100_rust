@@ -163,17 +163,46 @@ impl<'a> JsonExtractor<'a> {
     pub fn extract_template_map_removed_internal(&self, title: &str)->HashMap<String, String> {
         lazy_static! {
             static ref RE: Regex = Regex::new(r"\|(?P<field>.*?)=(?P<value>.*?)(?:\n|<ref)").unwrap();
-            // ((.*?)\|)? says that "[[blah|" or "[[" matches
-            static ref INTER_RE: Regex = Regex::new(r"\[\[((.*?)\|)?(?P<title>.*?)\]\]").unwrap();
+            static ref INTER_RE: Regex = Regex::new(r"\[\[([^\[\]]*)\]\]").unwrap();
         }
         let text = self.extract_template_txt(title);
 
         RE.captures_iter(&text)
             .map(|caps| {
                 let value = caps["value"].trim();
-                (caps["field"].trim().into(), INTER_RE.replace_all(value, "${title}").into())
-            })
-            .collect()
+                let value = INTER_RE.find_iter(value)
+                    .fold(value.to_string(), |acc, x|
+                        acc.replace(
+                            x.as_str(),
+                            x.as_str().trim_matches(|c| c == '[' || c == ']').split('|').last().unwrap()
+                        )
+                    );
+                (caps["field"].trim().into(), value.trim().replace(r#"'''"#, "").replace(r"''", ""))
+            }).collect()
+    }
+
+    /// ch03.28
+    pub fn shape_template(&self, title: &str)->HashMap<String, String> {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"\{\{([^{}]*)\}\}").unwrap();
+            static ref BR_RE: Regex = Regex::new(r"<br ?/?>").unwrap();
+        }
+        // remove <br \> or <br>
+        self.extract_template_map_removed_internal(title)
+            .into_iter()
+            .map(|(key, value)| {
+                let value = RE.find_iter(&value)
+                    .fold(value.clone(), |acc, x|
+                        acc.replace(
+                            x.as_str(),
+                            x.as_str().trim_matches(|c| c == '{' || c == '}')
+                                .split('|')
+                                .last()
+                                .unwrap()
+                        )
+                    );
+                (key, BR_RE.replace(&value, "").into())
+            }).collect()
     }
 }
 
