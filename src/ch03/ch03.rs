@@ -1,5 +1,6 @@
 extern crate reqwest;
 extern crate serde_json;
+extern crate regex;
 use self::serde_json::Result as jsonResult;
 use std::io::{BufReader, BufRead, copy, Result as ioResult};
 use std::path::Path;
