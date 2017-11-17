@@ -59,11 +59,19 @@ impl<'a> JsonExtractor<'a> {
     }
 
 
-    /// ch03.21 display text.
-    fn extract_text(&self, title: &str)->String {
+    /// ch03.21 extract text.
+    pub fn extract_text(&self, title: &str)->String {
         self.search(title)
             .unwrap()
             .text
+    }
+
+    /// ch03.22 extract Category lines that startswith [[Category:
+    pub fn extract_categories(&self, title: &str)->Vec<String> {
+        self.extract_text(title)
+        .lines()
+            .filter_map(|line| if line.starts_with("[[Category") {Some(line.into())} else {None})
+            .collect()
     }
 
 }
