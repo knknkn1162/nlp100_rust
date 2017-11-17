@@ -357,6 +357,8 @@ mod test {
         let key = "イギリス";
         let res = ext.extract_template_map_removed_internal(key);
 
+        // res.iter().for_each(|s| println!("{:?}", s));
+
         assert_eq!(
             res["標語"], "{{lang|fr|Dieu et mon droit}}<br/>（フランス語:神と私の権利）"
         );
@@ -364,6 +366,31 @@ mod test {
         assert_eq!(
             res["国歌"], "神よ女王陛下を守り給え"
         );
+
+        assert_eq!(
+            res["確立形態1"],
+            "イングランド王国／スコットランド王国<br />（両国とも1707年連合法まで）"
+        )
+    }
+
+    #[test]
+    fn test_shape_template() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.shape_template(key);
+
+        assert_eq!(
+            res["標語"], "Dieu et mon droit（フランス語:神と私の権利）"
+        );
+
+        assert_eq!(
+            res["国歌"], "神よ女王陛下を守り給え"
+        );
+
+        assert_eq!(
+            res["確立形態1"],
+            "イングランド王国／スコットランド王国（両国とも1707年連合法まで）"
+        )
     }
 
 
