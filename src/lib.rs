@@ -3,6 +3,8 @@
 extern crate log;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate lazy_static;
 
 pub mod ch01;
 pub mod ch02;
