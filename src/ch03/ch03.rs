@@ -420,6 +420,17 @@ mod test {
         assert_eq!(
             res["確立形態1"],
             "イングランド王国／スコットランド王国（両国とも1707年連合法まで）"
+        );
+
+    }
+
+    #[test]
+    fn test_get_flag_url() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let res = ext.get_flag_url();
+
+        assert_eq!(
+            res, "https://upload.wikimedia.org/wikipedia/commons/a/ae/Flag_of_the_United_Kingdom.svg"
         )
     }
 
