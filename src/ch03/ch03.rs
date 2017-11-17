@@ -114,6 +114,19 @@ impl<'a> JsonExtractor<'a> {
             ).collect()
     }
 
+    /// ch03.24 extract media file
+    /// see also https://ja.wikipedia.org/wiki/Help:画像の表示
+    pub fn extract_media_file(&self, title: &str)->Vec<String> {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"\[\[(?:File|ファイル):(.*?)\|").unwrap();
+        }
+
+        let text = self.extract_text(title);
+        RE.captures_iter(&text)
+            .filter_map(|caps| caps.get(1).map(|s| s.as_str().to_string()))
+            .collect()
+    }
+
 
 }
 
@@ -216,6 +229,23 @@ mod test {
                 Section{name: "政治".into(), level: 1},
             ]
         )
+    }
+
+    #[test]
+    fn test_extract_media_file() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.extract_media_file(key);
+
+        assert_eq!(
+            res.into_iter().take(5).collect::<Vec<_>>(),
+            vec!["Royal Coat of Arms of the United Kingdom.svg",
+                 "Battle of Waterloo 1815.PNG",
+                 "The British Empire.png",
+                 "Uk topo en.jpg",
+                 "BenNevis2005.jpg",
+            ]
+        );
     }
 
 }
