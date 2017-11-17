@@ -15,6 +15,12 @@ struct Article {
     text: String,
 }
 
+#[derive(Debug)]
+struct Section {
+    name: String,
+    level: u8,
+}
+
 fn get_json<T: reqwest::IntoUrl, P: AsRef<Path>>(url: T, save_dir: P)->ioResult<()> {
     let mut response = reqwest::get(url).unwrap();
     let fname = {
@@ -81,15 +87,33 @@ impl<'a> JsonExtractor<'a> {
     /// ch03.22 extract category names
     pub fn extract_category_names(&self, title: &str)->Vec<String> {
         lazy_static! {
-            static ref RE: Regex = Regex::new(r"\n\[\[Category:(.*)\]\]").unwrap();
+            static ref RE: Regex = Regex::new(r"\[\[Category:(.*)\]\]").unwrap();
         }
         let text = self.extract_text(title);
         RE.captures_iter(&text)
             .filter_map(|caps| caps.get(1))
             .map(|s| s.as_str().into())
             .collect()
-
     }
+
+    /// ch03.23 structure of section
+    /// see also https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Section_headings
+    pub fn extract_section(&self, title: &str)->Vec<Section> {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"(?P<start_section>={2,})(?P<name>.*?)(?P<end_section>={2,})").unwrap();
+        }
+        let text = self.extract_text(title);
+        RE.captures_iter(&text)
+            .filter_map(|caps|
+                if &caps["start_section"] == &caps["end_section"] {
+                    Some(Section {
+                        level: (caps["start_section"].len() - 1) as u8,
+                        name: caps["name"].into(),
+                    })
+                } else {None}
+            ).collect()
+    }
+
 
 }
 
