@@ -47,6 +47,25 @@ impl<'a> JsonExtractor<'a> {
     fn new<P: AsRef<Path>+?Sized>(path: &P)->JsonExtractor {
         JsonExtractor {path: path.as_ref()}
     }
+
+
+
+    /// helper for ch03.20; search designated article
+    fn search(&self, title: &str)->Option<Article> {
+        let reader = BufReader::new(File::open(self.path).unwrap());
+        reader.lines()
+            .flat_map(|line| serde_json::from_str::<Article>(&line.unwrap()))
+            .find(|line| line.title == title)
+    }
+
+
+    /// ch03.21 display text.
+    fn extract_text(&self, title: &str)->String {
+        self.search(title)
+            .unwrap()
+            .text
+    }
+
 }
 
 #[cfg(test)]
