@@ -128,21 +128,24 @@ impl<'a> JsonExtractor<'a> {
             .collect()
     }
 
-    /// ch03.25 extract template namespace & return as HashMap
-    pub fn extract_template(&self, title: &str)->HashMap<String, String>{
-        lazy_static! {
-            static ref RE: Regex = Regex::new(r"\|(?P<field>.*?)=(?P<value>.*?)(?:\n|<ref)").unwrap();
-        }
+    /// helper for ch03.25 extract template namespace
+    pub fn extract_template_txt(&self, title: &str)->String{
         let text = self.extract_text(title)
             .lines()
             .skip_while(|&s|s.starts_with("{{基本情報"))
             .take_while(|&s| s != "}}")
             .collect::<Vec<&str>>().join("\n");
+    }
 
+    /// ch03.25: extract template namespace & return as hashmap
+    pub fn extract_template_map(&self, title: &str)->HashMap<String, String> {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"\|(?P<field>.*?)=(?P<value>.*?)(?:\n|<ref)").unwrap();
+        }
+        let text = self.extract_template_txt(title);
         RE.captures_iter(&text)
             .map(|caps| (caps["field"].trim().into(), caps["value"].trim().into()))
             .collect()
-
     }
 }
 
