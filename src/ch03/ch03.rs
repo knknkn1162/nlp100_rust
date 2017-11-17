@@ -1,13 +1,15 @@
 extern crate reqwest;
 extern crate serde_json;
 extern crate regex;
-use self::serde_json::Result as jsonResult;
-use std::io::{BufReader, BufRead, copy, Result as ioResult};
+extern crate url;
+use self::serde_json::{Value, Result as jsonResult};
+use std::io::{BufReader, BufRead, Read, copy, Result as ioResult};
 use std::path::Path;
 use std::fs::File;
 use std::process::{Command, Stdio};
 use self::regex::{Regex, RegexBuilder};
 use std::collections::HashMap;
+use self::url::Url;
 
 
 #[derive(Serialize, Deserialize)]
@@ -181,7 +183,7 @@ impl<'a> JsonExtractor<'a> {
             }).collect()
     }
 
-    /// ch03.28
+    /// ch03.28 shape template namespace completely
     pub fn shape_template(&self, title: &str)->HashMap<String, String> {
         lazy_static! {
             static ref RE: Regex = Regex::new(r"\{\{([^{}]*)\}\}").unwrap();
@@ -204,6 +206,34 @@ impl<'a> JsonExtractor<'a> {
                 (key, BR_RE.replace(&value, "").into())
             }).collect()
     }
+
+    /// ch03.29 get flag url from Mediawiki
+    /// get response to https://ja.wikipedia.org/w/api.php?action=query&titles=File:Flag%20of%20the%20United%20Kingdom%2esvg&prop=imageinfo&iiprop=url
+    pub fn get_flag_url(&self)->String {
+        let fname = format!("File:{}", &self.shape_template("イギリス")["国旗画像"]);
+
+        let url = Url::parse_with_params(
+            "https://ja.wikipedia.org/w/api.php",
+            &[
+                ("action", "query"),
+                ("titles", &fname),
+                ("prop", "imageinfo"),
+                ("iiprop", "url"),
+                ("format", "json"),
+            ]
+        ).unwrap();
+        println!("{:?}", url);
+
+        let json: Value = reqwest::get(url)
+            .unwrap()
+            .json()
+            .unwrap();
+        json["query"]["pages"]["-1"]["imageinfo"][0]["url"].as_str()
+            .unwrap()
+            .into()
+    }
+
+
 }
 
 #[cfg(test)]
