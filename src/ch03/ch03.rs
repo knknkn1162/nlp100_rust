@@ -130,11 +130,11 @@ impl<'a> JsonExtractor<'a> {
 
     /// helper for ch03.25 extract template namespace
     pub fn extract_template_txt(&self, title: &str)->String{
-        let text = self.extract_text(title)
+        self.extract_text(title)
             .lines()
             .skip_while(|&s|s.starts_with("{{基本情報"))
             .take_while(|&s| s != "}}")
-            .collect::<Vec<&str>>().join("\n");
+            .collect::<Vec<&str>>().join("\n")
     }
 
     /// ch03.25: extract template namespace & return as hashmap
@@ -145,6 +145,17 @@ impl<'a> JsonExtractor<'a> {
         let text = self.extract_template_txt(title);
         RE.captures_iter(&text)
             .map(|caps| (caps["field"].trim().into(), caps["value"].trim().into()))
+            .collect()
+    }
+
+    /// ch03.26 In addition to ch03.25, remove the emphasize tag
+    pub fn extract_template_map_removed_em(&self, title: &str)->HashMap<String, String>  {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"\|(?P<field>.*?)=(?P<value>.*?)(?:\n|<ref)").unwrap();
+        }
+        let text = self.extract_template_txt(title);
+        RE.captures_iter(&text)
+            .map(|caps| (caps["field"].trim().into(), caps["value"].trim().replace(r#"'''"#, "")))
             .collect()
     }
 }
@@ -268,10 +279,12 @@ mod test {
     }
 
     #[test]
-    fn test_extract_template() {
+    fn test_extract_template_map() {
         let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
         let key = "イギリス";
-        let res = ext.extract_template(key);
+        let res = ext.extract_template_map(key);
+
+        res.iter().for_each(|s| println!("{:?}", s));
 
         assert_eq!(
             res["標語"], "{{lang|fr|Dieu et mon droit}}<br/>（[[フランス語]]:神と私の権利）"
