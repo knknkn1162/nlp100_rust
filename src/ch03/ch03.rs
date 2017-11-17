@@ -72,8 +72,23 @@ impl<'a> JsonExtractor<'a> {
     pub fn extract_categories(&self, title: &str)->Vec<String> {
         self.extract_text(title)
         .lines()
-            .filter_map(|line| if line.starts_with("[[Category") {Some(line.into())} else {None})
+            .filter_map(|line|
+                if line.starts_with("[[Category") {Some(line.into())} else {None}
+            )
             .collect()
+    }
+
+    /// ch03.22 extract category names
+    pub fn extract_category_names(&self, title: &str)->Vec<String> {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"\n\[\[Category:(.*)\]\]").unwrap();
+        }
+        let text = self.extract_text(title);
+        RE.captures_iter(&text)
+            .filter_map(|caps| caps.get(1))
+            .map(|s| s.as_str().into())
+            .collect()
+
     }
 
 }
@@ -134,6 +149,26 @@ mod test {
                 "[[Category:君主国]]",
                 "[[Category:島国|くれいとふりてん]]",
                 "[[Category:1801年に設立された州・地域]]"
+            ]
+        )
+    }
+
+    #[test]
+    fn test_extract_category_names() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.extract_category_names(key);
+
+        assert_eq!(
+            res,
+            vec!["イギリス|*",
+                 "英連邦王国|*",
+                 "G8加盟国",
+                 "欧州連合加盟国",
+                 "海洋国家",
+                 "君主国",
+                 "島国|くれいとふりてん",
+                 "1801年に設立された州・地域"
             ]
         )
     }
