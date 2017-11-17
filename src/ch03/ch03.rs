@@ -158,6 +158,23 @@ impl<'a> JsonExtractor<'a> {
             .map(|caps| (caps["field"].trim().into(), caps["value"].trim().replace(r#"'''"#, "").replace(r"''", "")))
             .collect()
     }
+
+    /// ch03.27 In addition to ch03.26, internal link
+    pub fn extract_template_map_removed_internal(&self, title: &str)->HashMap<String, String> {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"\|(?P<field>.*?)=(?P<value>.*?)(?:\n|<ref)").unwrap();
+            // ((.*?)\|)? says that "[[blah|" or "[[" matches
+            static ref INTER_RE: Regex = Regex::new(r"\[\[((.*?)\|)?(?P<title>.*?)\]\]").unwrap();
+        }
+        let text = self.extract_template_txt(title);
+
+        RE.captures_iter(&text)
+            .map(|caps| {
+                let value = caps["value"].trim();
+                (caps["field"].trim().into(), INTER_RE.replace_all(value, "${title}").into())
+            })
+            .collect()
+    }
 }
 
 #[cfg(test)]
@@ -302,6 +319,21 @@ mod test {
 
         assert_eq!(
             res["確立形態4"], "現在の国号「グレートブリテン及び北アイルランド連合王国」に変更"
+        );
+    }
+
+    #[test]
+    fn test_extract_template_map_removed_internal() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.extract_template_map_removed_internal(key);
+
+        assert_eq!(
+            res["標語"], "{{lang|fr|Dieu et mon droit}}<br/>（フランス語:神と私の権利）"
+        );
+
+        assert_eq!(
+            res["国歌"], "神よ女王陛下を守り給え"
         );
     }
 
