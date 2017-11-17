@@ -59,14 +59,14 @@ impl<'a> JsonExtractor<'a> {
     }
 
 
-    /// ch03.21 extract text.
+    /// ch03.20 extract text.
     pub fn extract_text(&self, title: &str)->String {
         self.search(title)
             .unwrap()
             .text
     }
 
-    /// ch03.22 extract Category lines that startswith [[Category:
+    /// ch03.21 extract Category lines that startswith [[Category:
     pub fn extract_categories(&self, title: &str)->Vec<String> {
         self.extract_text(title)
         .lines()
@@ -110,7 +110,30 @@ mod test {
         let key = "イギリス";
         let res = ext.extract_text(key);
 
-        assert_eq!(res.lines().next().unwrap(), "{{redirect|UK}}gi");
+        assert_eq!(res.lines().next().unwrap(), "{{redirect|UK}}");
+
+        // res.lines().for_each(|s| println!("{:?}", s));
+    }
+
+    #[test]
+    fn test_extract_categories() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.extract_categories(key);
+
+        assert_eq!(
+            res,
+            vec![
+                "[[Category:イギリス|*]]",
+                "[[Category:英連邦王国|*]]",
+                "[[Category:G8加盟国]]",
+                "[[Category:欧州連合加盟国]]",
+                "[[Category:海洋国家]]",
+                "[[Category:君主国]]",
+                "[[Category:島国|くれいとふりてん]]",
+                "[[Category:1801年に設立された州・地域]]"
+            ]
+        )
     }
 
 }
