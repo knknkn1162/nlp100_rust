@@ -155,7 +155,7 @@ impl<'a> JsonExtractor<'a> {
         }
         let text = self.extract_template_txt(title);
         RE.captures_iter(&text)
-            .map(|caps| (caps["field"].trim().into(), caps["value"].trim().replace(r#"'''"#, "")))
+            .map(|caps| (caps["field"].trim().into(), caps["value"].trim().replace(r#"'''"#, "").replace(r"''", "")))
             .collect()
     }
 }
@@ -292,6 +292,17 @@ mod test {
 
         assert_eq!(res["公式国名"], "{{lang|en|United Kingdom of Great Britain and Northern Ireland}}");
         assert_eq!(res["GDP値MER"], "2兆4337億");
+    }
+
+    #[test]
+    fn test_extract_template_map_removed_em() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.extract_template_map_removed_em(key);
+
+        assert_eq!(
+            res["確立形態4"], "現在の国号「グレートブリテン及び北アイルランド連合王国」に変更"
+        );
     }
 
 
