@@ -1,9 +1,17 @@
 extern crate reqwest;
-use std::io::{Read, copy, Result as ioResult};
+extern crate serde_json;
+use self::serde_json::Result as jsonResult;
+use std::io::{BufReader, BufRead, copy, Result as ioResult};
 use std::path::Path;
 use std::fs::File;
 use std::process::{Command, Stdio};
 
+
+#[derive(Serialize, Deserialize)]
+struct Article {
+    title: String,
+    text: String,
+}
 
 fn get_json<T: reqwest::IntoUrl, P: AsRef<Path>>(url: T, save_dir: P)->ioResult<()> {
     let mut response = reqwest::get(url).unwrap();
