@@ -6,7 +6,8 @@ use std::io::{BufReader, BufRead, copy, Result as ioResult};
 use std::path::Path;
 use std::fs::File;
 use std::process::{Command, Stdio};
-use self::regex::Regex;
+use self::regex::{Regex, RegexBuilder};
+use std::collections::HashMap;
 
 
 #[derive(Serialize, Deserialize)]
@@ -127,7 +128,22 @@ impl<'a> JsonExtractor<'a> {
             .collect()
     }
 
+    /// ch03.25 extract template namespace & return as HashMap
+    pub fn extract_template(&self, title: &str)->HashMap<String, String>{
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"\|(?P<field>.*?)=(?P<value>.*?)(?:\n|<ref)").unwrap();
+        }
+        let text = self.extract_text(title)
+            .lines()
+            .skip_while(|&s|s.starts_with("{{基本情報"))
+            .take_while(|&s| s != "}}")
+            .collect::<Vec<&str>>().join("\n");
 
+        RE.captures_iter(&text)
+            .map(|caps| (caps["field"].trim().into(), caps["value"].trim().into()))
+            .collect()
+
+    }
 }
 
 #[cfg(test)]
