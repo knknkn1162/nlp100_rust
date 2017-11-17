@@ -222,7 +222,6 @@ impl<'a> JsonExtractor<'a> {
                 ("format", "json"),
             ]
         ).unwrap();
-        println!("{:?}", url);
 
         let json: Value = reqwest::get(url)
             .unwrap()
@@ -427,6 +426,7 @@ mod test {
     #[test]
     fn test_get_flag_url() {
         let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        // query is https://ja.wikipedia.org/w/api.php?action=query&titles=File%3AFlag+of+the+United+Kingdom.svg&prop=imageinfo&iiprop=url&format=json
         let res = ext.get_flag_url();
 
         assert_eq!(
