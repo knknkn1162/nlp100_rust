@@ -15,7 +15,7 @@ struct Article {
     text: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 struct Section {
     name: String,
     level: u8,
@@ -193,6 +193,27 @@ mod test {
                  "君主国",
                  "島国|くれいとふりてん",
                  "1801年に設立された州・地域"
+            ]
+        )
+    }
+
+    #[test]
+    fn test_extract_section() {
+        let ext = JsonExtractor::new("./data/ch03/jawiki-country.json");
+        let key = "イギリス";
+        let res = ext.extract_section(key);
+
+        res.iter()
+            .for_each(|section| assert!(section.level>=1));
+
+        assert_eq!(
+            res.into_iter().take(5).collect::<Vec<_>>(),
+            vec![
+                Section{name:"国名".into(), level: 1},
+                Section{name:"歴史".into(), level: 1},
+                Section{name:"地理".into(), level: 1},
+                Section{name: "気候".into(), level: 2},
+                Section{name: "政治".into(), level: 1},
             ]
         )
     }
